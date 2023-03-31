@@ -1,0 +1,8 @@
+settings:
+  token_env: TOKEN
+  parse_mode: html
+  long_poller: {}
+
+buttons:
+
+markups:
