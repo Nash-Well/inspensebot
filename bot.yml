@@ -3,6 +3,9 @@ settings:
   parse_mode: html
   long_poller: {}
 
+commands:
+  /start: 'Запуск бота'
+
 buttons:
 
 markups:
