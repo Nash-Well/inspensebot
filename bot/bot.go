@@ -37,10 +37,18 @@ func New(path string, boot BootStrap) (*Bot, error) {
 }
 
 func (b *Bot) Start() {
-	b.Use(b.Middleware("uk"))
+	// Middleware
+	b.Use(b.Middleware("uk", b.localeFunc))
 
-	//Handlers
+	// Handlers
 	b.Handle("/start", b.onStart)
+
+	// Callbacks
+	b.Handle(b.Callback("lang"), b.onLanguage)
+
+	for _, locale := range b.Locales() {
+		b.Handle(b.ButtonLocale(locale, "settings"), b.onSettings)
+	}
 
 	b.Bot.Start()
 }

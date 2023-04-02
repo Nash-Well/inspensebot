@@ -7,5 +7,21 @@ commands:
   /start: 'Запуск бота'
 
 buttons:
+  settings: '{{ text `btn_settings` }}'
+
+  lang: &lang
+    unique: lang
+  uk:
+    <<: *lang
+    data: 'uk'
+    text: '🇺🇦'
+  en:
+    <<: *lang
+    data: 'en'
+    text: '🇬🇧'
 
 markups:
+  menu:
+    - [ settings ]
+  lang_menu:
+    - [ uk, en ]

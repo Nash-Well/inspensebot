@@ -1,0 +1,22 @@
+start: |-
+  {{ if not .LastName }}
+  👋 <b>Hello {{ .FirstName }}</b>
+  {{ else }}
+  👋 <b>Hello {{ .FirstName }} {{ .LastName }}</b>!
+  {{ end }}
+  Nice to meet you!
+  
+  🧾 I will help you manage your finances and keep track of your expenses and incomes.
+  
+  💬 To start working with the bot, <b><i>enter a command</i></b> or
+  <b><i>select a button from the menu</i></b> and follow the instructions on the screen.
+  
+  🤝 <b>Let's get started!</b>
+
+lang_success: '🔄 Language successfully updated'
+
+# help
+help_lang: '🤔 Language selection: '
+
+# buttons
+btn_settings: 'Settings'

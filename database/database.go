@@ -8,6 +8,7 @@ import (
 
 type DB struct {
 	*sqlx.DB
+	Users UserStorage
 }
 
 func Open(url string) (*DB, error) {
@@ -17,10 +18,11 @@ func Open(url string) (*DB, error) {
 	}
 
 	return &DB{
-		DB: db,
+		DB:    db,
+		Users: &Users{DB: db},
 	}, nil
 }
 
 func (db *DB) Migrate() error {
-	return goose.Up(db.DB.DB, "database/sql")
+	return goose.Up(db.DB.DB, "sql")
 }
