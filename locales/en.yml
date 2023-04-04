@@ -11,12 +11,17 @@ start: |-
   💬 To start working with the bot, <b><i>enter a command</i></b> or
   <b><i>select a button from the menu</i></b> and follow the instructions on the screen.
   
+  ⁉️ <b>Use Settings to change a language.</b>
   🤝 <b>Let's get started!</b>
 
+add_fin: '❓ Chose type of finance: '
 lang_success: '🔄 Language successfully updated'
 
 # help
 help_lang: '🤔 Language selection: '
 
 # buttons
-btn_settings: 'Settings'
+btn_add: '⌨️ Add Finance'
+btn_settings: '⚙️ Settings'
+btn_inc: '📈 Income'
+btn_exp: '📉 Expense'

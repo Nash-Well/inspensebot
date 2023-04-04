@@ -47,6 +47,7 @@ func (b *Bot) Start() {
 	b.Handle(b.Callback("lang"), b.onLanguage)
 
 	for _, locale := range b.Locales() {
+		b.Handle(b.ButtonLocale(locale, "add"), b.onAdd)
 		b.Handle(b.ButtonLocale(locale, "settings"), b.onSettings)
 	}
 

@@ -7,7 +7,19 @@ commands:
   /start: 'Запуск бота'
 
 buttons:
+  add: '{{ text `btn_add` }}'
   settings: '{{ text `btn_settings` }}'
+
+  fin_type: &type
+    unique: type
+  inc:
+    <<: *type
+    text: '{{ text `btn_inc` }}'
+    data: Income
+  exp:
+    <<: *type
+    text: '{{ text `btn_exp` }}'
+    data: Expense
 
   lang: &lang
     unique: lang
@@ -22,6 +34,9 @@ buttons:
 
 markups:
   menu:
+    - [ add ]
     - [ settings ]
   lang_menu:
     - [ uk, en ]
+  type_menu:
+    - [ inc, exp ]
