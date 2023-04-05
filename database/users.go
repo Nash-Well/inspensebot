@@ -8,6 +8,13 @@ import (
 
 type State string
 
+const (
+	DefaultState    = ""
+	AddingTypeState = "adding_type"
+	AddingAmount    = "adding_amount"
+	AddingDate      = "adding_date"
+)
+
 type (
 	UserStorage interface {
 		ByID(id int64) (User, error)
@@ -47,7 +54,7 @@ func (db Users) Create(id int64) error {
 
 func (db *Users) SetState(id int64, state State) error {
 	const q = "UPDATE users SET state=$1 WHERE id=$2"
-	_, err := db.Exec(q, string(state), id)
+	_, err := db.Exec(q, state, id)
 	return err
 }
 

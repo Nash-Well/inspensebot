@@ -15,11 +15,11 @@ buttons:
   inc:
     <<: *type
     text: '{{ text `btn_inc` }}'
-    data: Income
+    data: income
   exp:
     <<: *type
     text: '{{ text `btn_exp` }}'
-    data: Expense
+    data: expense
 
   lang: &lang
     unique: lang

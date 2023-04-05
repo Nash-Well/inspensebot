@@ -42,9 +42,11 @@ func (b *Bot) Start() {
 
 	// Handlers
 	b.Handle("/start", b.onStart)
+	b.Handle(tele.OnText, b.onText)
 
 	// Callbacks
 	b.Handle(b.Callback("lang"), b.onLanguage)
+	b.Handle(b.Callback("fin_type"), b.onType)
 
 	for _, locale := range b.Locales() {
 		b.Handle(b.ButtonLocale(locale, "add"), b.onAdd)

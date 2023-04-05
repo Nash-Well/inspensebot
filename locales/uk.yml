@@ -13,16 +13,24 @@ start: |-
   <b><i>Вибери кнопку з меню</i></b> та слідуй інструкціям на екрані.
 
   ⁉️ <b>Use Settings to change a language.</b>
+  
   🤝 <b>Давайте розпочнемо!</b>
 
-add_fin: '❓ Вибери тип фінансу: '
+# auxiliary
+add_fin: 'Вибери тип фінансу: '
+add_date: '📅 Введи дату: '
+add_amount: '💵 Введи суму: '
+fin_added: '👌 <b>Успішно внесено у базу</b>'
 lang_success: '🔄 Мову успішно змінено'
 
 # help
 help_lang: '🤔 Вибір мови: '
 
+# errors
+error_date: '🛑 Невірний формат дати <code>dd.mm.yyyy</code>'
+
 # buttons
 btn_add: '⌨️ Додати'
 btn_settings: '⚙️ Налаштування'
-btn_inc: 'Дохід'
-btn_exp: 'Витрата'
+btn_inc: '📈 Дохід'
+btn_exp: '📉 Витрата'

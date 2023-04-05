@@ -12,13 +12,21 @@ start: |-
   <b><i>select a button from the menu</i></b> and follow the instructions on the screen.
   
   ⁉️ <b>Use Settings to change a language.</b>
+  
   🤝 <b>Let's get started!</b>
 
-add_fin: '❓ Chose type of finance: '
+# auxiliary
+add_fin: 'Chose type of finance: '
+add_date: '📅 Enter a date: '
+add_amount: '💵 Enter amount: '
+fin_added: '👌 <b>Successfully added into database</b>'
 lang_success: '🔄 Language successfully updated'
 
 # help
 help_lang: '🤔 Language selection: '
+
+# errors
+error_date: '🛑 Wrong format of date <code>dd.mm.yyyy</code>'
 
 # buttons
 btn_add: '⌨️ Add Finance'
