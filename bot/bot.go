@@ -43,10 +43,13 @@ func (b *Bot) Start() {
 	// Handlers
 	b.Handle("/start", b.onStart)
 	b.Handle(tele.OnText, b.onText)
+	b.Handle(tele.OnMedia, b.onMedia)
 
 	// Callbacks
 	b.Handle(b.Callback("lang"), b.onLanguage)
 	b.Handle(b.Callback("fin_type"), b.onType)
+	b.Handle(b.Callback("recipient"), b.onRecipient)
+	b.Handle(b.Callback("cancel"), b.onCancel)
 
 	for _, locale := range b.Locales() {
 		b.Handle(b.ButtonLocale(locale, "add"), b.onAdd)

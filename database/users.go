@@ -13,6 +13,7 @@ const (
 	AddingTypeState = "adding_type"
 	AddingAmount    = "adding_amount"
 	AddingDate      = "adding_date"
+	AddingMedia     = "adding_media"
 )
 
 type (

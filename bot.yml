@@ -4,11 +4,27 @@ settings:
   long_poller: {}
 
 commands:
-  /start: 'Запуск бота'
+  /start: 'Start bot'
 
 buttons:
+  # reply buttons
   add: '{{ text `btn_add` }}'
   settings: '{{ text `btn_settings` }}'
+
+  recipient: &recipient
+    unique: recipient
+  exists:
+    <<: *recipient
+    data: exists
+    text: '{{ text `btn_exists` }}'
+  not_exists:
+    <<: *recipient
+    data: not_exists
+    text: '{{ text `btn_not_exists` }}'
+
+  cancel:
+    unique: cancel
+    text: '{{ text `btn_cancel` }}'
 
   fin_type: &type
     unique: type
@@ -36,7 +52,16 @@ markups:
   menu:
     - [ add ]
     - [ settings ]
+
   lang_menu:
     - [ uk, en ]
+
   type_menu:
     - [ inc, exp ]
+
+  recipient_menu:
+    - [ exists ]
+    - [ not_exists ]
+
+  cancel_opts:
+    - [ cancel ]

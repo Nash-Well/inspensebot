@@ -72,12 +72,17 @@ func (b Bot) onDate(c tele.Context) error {
 		return c.Send(b.Text(c, "error_date"))
 	}
 
-	defer finCache.Delete(userID)
-
 	finance.Date = t
 	finCache.Store(userID, finance)
 
-	return c.Send(b.Text(c, "fin_added"))
+	if err := b.db.Users.SetState(userID, database.AddingMedia); err != nil {
+		return err
+	}
+
+	return c.EditOrSend(
+		b.Text(c, "recipient"),
+		b.Markup(c, "recipient_menu"),
+	)
 }
 
 func userCache(userID int64) (database.Finance, error) {
@@ -87,4 +92,30 @@ func userCache(userID int64) (database.Finance, error) {
 	}
 
 	return finance, nil
+}
+
+func (b Bot) onMedia(c tele.Context) error {
+	var (
+		mediaType = c.Message().Media().MediaType()
+		mediaID   = c.Message().Media().MediaFile().FileID
+	)
+
+	defer b.db.Users.SetState(c.Sender().ID, database.DefaultState)
+
+	switch mediaType {
+	case "photo":
+		_, err := b.Send(
+			c.Chat(),
+			&tele.Photo{File: tele.File{FileID: mediaID}},
+		)
+		return err
+	case "document":
+		_, err := b.Send(
+			c.Chat(),
+			&tele.Document{File: tele.File{FileID: mediaID}},
+		)
+		return err
+	default:
+		return nil
+	}
 }
