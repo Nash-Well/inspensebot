@@ -9,5 +9,7 @@ create table category(
 create table subcategory(
         id              serial          primary key,
         name            varchar(40)     not null default 'none',
-        category_id     int             references category (id)
+        category_id     int             not null,
+
+        foreign key (category_id) references category (id)
 );
