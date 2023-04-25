@@ -17,7 +17,7 @@ func (b Bot) onRecipient(c tele.Context) error {
 		state, _ := b.db.Users.State(userID)
 		log.Println(state)
 		return c.EditOrSend(
-			b.Text(c, "recipient_exists"),
+			b.Text(c, "recipient"),
 			b.Markup(c, "cancel_opts"),
 		)
 	case "not_exists":

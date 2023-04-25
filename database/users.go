@@ -9,11 +9,13 @@ import (
 type State string
 
 const (
-	DefaultState    = ""
-	AddingTypeState = "adding_type"
-	AddingAmount    = "adding_amount"
-	AddingDate      = "adding_date"
-	AddingMedia     = "adding_media"
+	DefaultState      = ""
+	AddingTypeState   = "adding_type"
+	AddingAmount      = "adding_amount"
+	AddingDate        = "adding_date"
+	AddingCategory    = "adding_category"
+	AddingSubcategory = "adding_subcategory"
+	AddingMedia       = "adding_media"
 )
 
 type (

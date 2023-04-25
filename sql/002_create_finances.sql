@@ -7,12 +7,8 @@ create table finances (
         type                varchar(30)         not null,
         date                timestamp           not null default now(),
         amount              float               not null default 0,
-        category_id         int                 not null,
-        subcategory_id      int                 not null,
-
-        foreign key (user_id) references users (id),
-        foreign key (category_id) references category (id),
-        foreign key (subcategory_id) references subcategory (id)
+        category            varchar             not null,
+        subcategory         varchar             not null
 );
 
 create table recipient (

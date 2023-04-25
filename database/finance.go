@@ -7,9 +7,10 @@ import (
 
 type (
 	FinanceStorage interface {
-		Create(userID int64, f Finance) error
-		List(userID int64) ([]Finance, error)
-		ByID(id int) (Finance, error)
+		Create(f Finance) error
+		CategoryList(userID int64) ([]Finance, error)
+		//List(userID int64) ([]Finance, error)
+		//ByID(id int) (Finance, error)
 	}
 
 	Finances struct {
@@ -17,27 +18,23 @@ type (
 	}
 
 	Finance struct {
-		ID       int       `db:"id"`
-		UserID   int64     `db:"user_id,omitempty"`
-		Type     string    `db:"type,omitempty"`
-		Date     time.Time `db:"date,omitempty"`
-		Amount   float64   `db:"amount,omitempty"`
-		Category string    `db:"category,omitempty"`
+		ID          int       `db:"id"`
+		UserID      int64     `db:"user_id,omitempty"`
+		Type        string    `db:"type,omitempty"`
+		Date        time.Time `db:"date,omitempty"`
+		Amount      float64   `db:"amount,omitempty"`
+		Category    string    `db:"category,omitempty"`
+		Subcategory string    `db:"subcategory,omitempty"`
 	}
 )
 
-func (db *Finances) ByID(id int) (f Finance, _ error) {
-	const q = "SELECT * FROM finances WHERE id=$1"
-	return f, db.Get(&f, q, id)
-}
-
-func (db *Finances) Create(userID int64, f Finance) error {
-	const q = `INSERT INTO finances(user_id, type, date, amount, category) VALUES ($1, $2, $3, $4, $5)`
-	_, err := db.Exec(q, userID, f.Type, f.Date, f.Amount, f.Category)
+func (db *Finances) Create(f Finance) error {
+	const q = `INSERT INTO finances(user_id, type, date, amount, category, subcategory) VALUES ($1, $2, $3, $4, $5, $6)`
+	_, err := db.Exec(q, f.UserID, f.Type, f.Date, f.Amount, f.Category, f.Subcategory)
 	return err
 }
 
-func (db *Finances) List(userID int64) (f []Finance, _ error) {
-	const q = "SELECT * FROM finances WHERE user_id=$1"
+func (db *Finances) CategoryList(userID int64) (f []Finance, _ error) {
+	const q = `SELECT * FROM finances WHERE user_id=$1`
 	return f, db.Select(&f, q, userID)
 }

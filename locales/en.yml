@@ -8,8 +8,7 @@ start: |-
   
   🧾 I will help you manage your finances and keep track of your expenses and incomes.
   
-  💬 To start working with the bot, <b><i>enter a command</i></b> or
-  <b><i>select a button from the menu</i></b> and follow the instructions on the screen.
+  💬 To start working with the bot, <b><i>enter a command</i></b> or <b><i>select a button from the menu</i></b> and follow the instructions on the screen.
   
   ⁉️ <b>Use Settings to change a language.</b>
   
@@ -19,6 +18,9 @@ start: |-
 add_fin: 'Chose type of finance: '
 add_date: '📅 Enter a date: '
 add_amount: '💵 Enter amount: '
+add_category: '📁 Enter category:'
+subcategory: '❓ Do you want to enter subcategory?'
+add_subcategory: '🔖 Enter subcategory:'
 fin_added: '👌 <b>Successfully added into database</b>'
 lang_success: '🔄 Language successfully updated'
 recipient: '<i>Send a recipient please: </i>'
@@ -29,12 +31,19 @@ help_lang: '🤔 Language selection: '
 
 # errors
 error_date: '🛑 Wrong format of date <code>dd.mm.yyyy</code>'
+error_number: '🤨 Seems like a <b>number</b>.'
+error_negative: '🤨 Finance can`t be <b>negative</b>!'
+error_time: '🛑 You can`t enter a date which is <b>doesn`t happened</b>.'
 
 # buttons
 btn_add: '⌨️ Add Finance'
 btn_settings: '⚙️ Settings'
 btn_inc: '📈 Income'
 btn_exp: '📉 Expense'
-btn_exists: '✅ Yes'
-btn_not_exists: '❌ No'
+btn_exists: '✅ Exists'
+btn_not_exists: '❌ Not exists'
+btn_approval: '✅ Yes'
+btn_not_apr: '❌ No'
+btn_forward: '➡️ Forward'
+btn_back: '⬅️ Back'
 btn_cancel: '🚫 Cancel'

@@ -5,11 +5,39 @@ settings:
 
 commands:
   /start: 'Start bot'
+  /add: 'Add Finance'
 
 buttons:
   # reply buttons
   add: '{{ text `btn_add` }}'
   settings: '{{ text `btn_settings` }}'
+
+  #inline
+  fin_type: &type
+    unique: type
+  inc:
+    <<: *type
+    text: '{{ text `btn_inc` }}'
+    data: income
+  exp:
+    <<: *type
+    text: '{{ text `btn_exp` }}'
+    data: expense
+
+  category:
+    unique: category
+    data: ['{{ .ID }}', '{{ .Category }}']
+    text: '{{ .Category }}'
+
+
+  forward:
+    unique: forward
+    data: forward
+    text: '{{ text `btn_forward` }}'
+  back:
+    unique: back
+    data: back
+    text: '{{ text `btn_back` }}'
 
   recipient: &recipient
     unique: recipient
@@ -26,16 +54,16 @@ buttons:
     unique: cancel
     text: '{{ text `btn_cancel` }}'
 
-  fin_type: &type
-    unique: type
-  inc:
-    <<: *type
-    text: '{{ text `btn_inc` }}'
-    data: income
-  exp:
-    <<: *type
-    text: '{{ text `btn_exp` }}'
-    data: expense
+  subcat: &subcat
+    unique: subcat
+  agr:
+    <<: *subcat
+    data: approval
+    text: '{{ text `btn_approval` }}'
+  not_agr:
+    <<: *subcat
+    data: not_apr
+    text: '{{ text `btn_not_apr` }}'
 
   lang: &lang
     unique: lang
@@ -59,9 +87,14 @@ markups:
   type_menu:
     - [ inc, exp ]
 
+  subcategory_menu:
+    - [ agr, not_agr ]
+
+  nav_menu:
+    - [ back, forward ]
+
   recipient_menu:
-    - [ exists ]
-    - [ not_exists ]
+    - [ exists, not_exists ]
 
   cancel_opts:
     - [ cancel ]
