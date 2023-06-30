@@ -21,7 +21,7 @@ func (b Bot) onRecipient(c tele.Context) error {
 			b.Markup(c, "cancel_opts"),
 		)
 	case "not_exists":
-		defer b.db.Users.SetState(userID, database.DefaultState)
+		defer b.db.Users.SetState(userID, database.StateIdle)
 		defer finCache.Delete(userID)
 
 		if err := c.Delete(); err != nil {

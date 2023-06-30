@@ -93,5 +93,8 @@ markups:
   recipient_menu:
     - [ exists, not_exists ]
 
+  nav_bar:
+    - [ back, forward ]
+
   cancel_opts:
     - [ cancel ]

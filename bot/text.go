@@ -14,13 +14,13 @@ func (b Bot) onText(c tele.Context) error {
 	defer b.deleteWithReply(c)
 
 	switch state {
-	case database.AddingAmount:
+	case database.StateAddAmount:
 		return b.onAmount(c)
-	case database.AddingDate:
+	case database.StateAddDate:
 		return b.onDate(c)
-	case database.AddingCategory:
+	case database.StateAddCategory:
 		return b.onCategory(c)
-	case database.AddingSubcategory:
+	case database.StateAddSubCategory:
 		return b.onSubCategory(c)
 	default:
 		return nil
@@ -44,7 +44,7 @@ func (b Bot) onMedia(c tele.Context) error {
 		mediaID   = c.Message().Media().MediaFile().FileID
 	)
 
-	defer b.db.Users.SetState(c.Sender().ID, database.DefaultState)
+	defer b.db.Users.SetState(c.Sender().ID, database.StateIdle)
 
 	switch mediaType {
 	case "photo":

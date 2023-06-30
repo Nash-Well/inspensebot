@@ -14,7 +14,7 @@ import (
 var finCache = xsync.NewIntegerMapOf[int64, database.Finance]()
 
 func (b Bot) onAdd(c tele.Context) error {
-	if err := b.db.Users.SetState(c.Sender().ID, database.AddingTypeState); err != nil {
+	if err := b.db.Users.SetState(c.Sender().ID, database.StateAddType); err != nil {
 		return err
 	}
 
@@ -33,7 +33,7 @@ func (b Bot) onType(c tele.Context) error {
 	)
 	defer c.Delete()
 
-	if err := b.db.Users.SetState(id, database.AddingAmount); err != nil {
+	if err := b.db.Users.SetState(id, database.StateAddAmount); err != nil {
 		return err
 	}
 
@@ -71,7 +71,7 @@ func (b Bot) onAmount(c tele.Context) error {
 
 	finCache.Store(userID, finance)
 
-	if err := b.db.Users.SetState(userID, database.AddingDate); err != nil {
+	if err := b.db.Users.SetState(userID, database.StateAddDate); err != nil {
 		return err
 	}
 
@@ -110,7 +110,7 @@ func (b Bot) onDate(c tele.Context) error {
 	finance.Date = t
 	finCache.Store(userID, finance)
 
-	if err := b.db.Users.SetState(userID, database.AddingCategory); err != nil {
+	if err := b.db.Users.SetState(userID, database.StateAddCategory); err != nil {
 		return err
 	}
 
@@ -132,7 +132,7 @@ func (b Bot) onDate(c tele.Context) error {
 func (b Bot) quickCategories(c tele.Context, list []database.Finance, page int) error {
 	var (
 		markup          = b.NewMarkup()
-		navButtons      []tele.InlineButton
+		navMarkup       = b.Markup(c, "nav_bar", page)
 		categoryButtons [][]tele.InlineButton
 	)
 
@@ -146,21 +146,8 @@ func (b Bot) quickCategories(c tele.Context, list []database.Finance, page int) 
 		categoryButtons = append(categoryButtons, []tele.InlineButton{button})
 	}
 
-	row := tele.Row{
-		*b.Button(c, "back", page),
-		*b.Button(c, "forward", page),
-	}
-
-	for _, row := range row {
-		navButtons = append(navButtons, tele.InlineButton{
-			Unique: row.Unique,
-			Data:   row.Data,
-			Text:   row.Text,
-		})
-	}
-
 	markup.InlineKeyboard = append(markup.InlineKeyboard, categoryButtons...)
-	markup.InlineKeyboard = append(markup.InlineKeyboard, navButtons)
+	markup.InlineKeyboard = append(markup.InlineKeyboard, navMarkup.InlineKeyboard...)
 
 	return c.EditOrSend(
 		b.Text(c, "add_category"),
@@ -238,7 +225,7 @@ func (b Bot) onQuickCategory(c tele.Context) error {
 
 	defer c.Delete()
 
-	if err := b.db.Users.SetState(userID, database.AddingSubcategory); err != nil {
+	if err := b.db.Users.SetState(userID, database.StateAddSubCategory); err != nil {
 		return err
 	}
 
@@ -270,7 +257,7 @@ func (b Bot) onCategory(c tele.Context) error {
 	finance.Category = msg
 	finCache.Store(userID, finance)
 
-	if err := b.db.Users.SetState(userID, database.AddingSubcategory); err != nil {
+	if err := b.db.Users.SetState(userID, database.StateAddSubCategory); err != nil {
 		return err
 	}
 
@@ -340,7 +327,7 @@ func (b Bot) addFinance(c tele.Context, f database.Finance) error {
 		return err
 	}
 
-	if err := b.db.Users.SetState(userID, database.DefaultState); err != nil {
+	if err := b.db.Users.SetState(userID, database.StateIdle); err != nil {
 		return err
 	}
 
