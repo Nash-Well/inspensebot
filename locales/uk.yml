@@ -45,6 +45,6 @@ btn_exists: '✅ Є'
 btn_not_exists: '❌ Немає'
 btn_approval: '✅ Так'
 btn_not_apr: '❌ Ні'
-btn_forward: '➡️ Вперед'
+btn_forward: 'Вперед ➡️'
 btn_back: '⬅️ Назад'
 btn_cancel: '🚫 Відмінити'

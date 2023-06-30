@@ -53,6 +53,8 @@ func (b *Bot) Start() {
 	b.Handle(b.Callback("subcat"), b.onSubMenu)
 	b.Handle(b.Callback("recipient"), b.onRecipient)
 	b.Handle(b.Callback("cancel"), b.onCancel)
+	b.Handle(b.Callback("back"), b.onBackCategory)
+	b.Handle(b.Callback("forward"), b.onForwardCategory)
 
 	for _, locale := range b.Locales() {
 		b.Handle(b.ButtonLocale(locale, "add"), b.onAdd)

@@ -26,17 +26,17 @@ buttons:
 
   category:
     unique: category
-    data: ['{{ .ID }}', '{{ .Category }}']
+    data: '{{ .Category }}'
     text: '{{ .Category }}'
 
 
   forward:
     unique: forward
-    data: forward
+    data: '{{ . }}'
     text: '{{ text `btn_forward` }}'
   back:
     unique: back
-    data: back
+    data: '{{ . }}'
     text: '{{ text `btn_back` }}'
 
   recipient: &recipient
@@ -89,9 +89,6 @@ markups:
 
   subcategory_menu:
     - [ agr, not_agr ]
-
-  nav_menu:
-    - [ back, forward ]
 
   recipient_menu:
     - [ exists, not_exists ]

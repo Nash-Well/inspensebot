@@ -8,7 +8,8 @@ import (
 type (
 	FinanceStorage interface {
 		Create(f Finance) error
-		CategoryList(userID int64) ([]Finance, error)
+		CategoryCount(userID int64) (int, error)
+		CategoryList(userID int64, page int) ([]Finance, error)
 		//List(userID int64) ([]Finance, error)
 		//ByID(id int) (Finance, error)
 	}
@@ -34,7 +35,13 @@ func (db *Finances) Create(f Finance) error {
 	return err
 }
 
-func (db *Finances) CategoryList(userID int64) (f []Finance, _ error) {
-	const q = `SELECT * FROM finances WHERE user_id=$1`
-	return f, db.Select(&f, q, userID)
+func (db *Finances) CategoryList(userID int64, page int) (f []Finance, err error) {
+	const q = `SELECT category FROM finances WHERE user_id=$1 GROUP BY category ORDER BY category DESC LIMIT 4 OFFSET $2`
+	offset := page * 4
+	return f, db.Select(&f, q, userID, offset)
+}
+
+func (db *Finances) CategoryCount(userID int64) (c int, _ error) {
+	const q = `SELECT COUNT(*) FROM finances WHERE user_id=$1 GROUP BY category ORDER BY category DESC`
+	return c, db.Get(&c, q, userID)
 }

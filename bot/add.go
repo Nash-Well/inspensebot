@@ -5,15 +5,13 @@ import (
 	"github.com/puzpuzpuz/xsync/v2"
 	tele "gopkg.in/telebot.v3"
 	"inspense-bot/database"
+	"math"
 	"regexp"
 	"strconv"
 	"time"
 )
 
-var (
-	finCache   = xsync.NewIntegerMapOf[int64, database.Finance]()
-	categories = xsync.NewMapOf[database.Finance]()
-)
+var finCache = xsync.NewIntegerMapOf[int64, database.Finance]()
 
 func (b Bot) onAdd(c tele.Context) error {
 	if err := b.db.Users.SetState(c.Sender().ID, database.AddingTypeState); err != nil {
@@ -116,13 +114,13 @@ func (b Bot) onDate(c tele.Context) error {
 		return err
 	}
 
-	list, err := b.db.Finances.CategoryList(userID)
+	list, err := b.db.Finances.CategoryList(userID, 0)
 	if err != nil {
 		return err
 	}
 
 	if len(list) > 0 {
-		return b.quickCategories(c, list)
+		return b.quickCategories(c, list, 0)
 	}
 
 	return c.Send(
@@ -131,43 +129,103 @@ func (b Bot) onDate(c tele.Context) error {
 	)
 }
 
-func (b Bot) quickCategories(c tele.Context, list []database.Finance) error {
-	var row tele.Row
-
-	for _, val := range list {
-		categories.Store(val.Category, val)
-	}
-
-	categories.Range(func(key string, f database.Finance) bool {
-		if len(row) >= 6 {
-			return false
-		}
-
-		row = append(row, *b.Button(c, "category", f))
-		return true
-	})
-
+func (b Bot) quickCategories(c tele.Context, list []database.Finance, page int) error {
 	var (
-		markup = b.NewMarkup()
-		navBtn = []tele.Btn{
-			*b.Button(c, "back"),
-			*b.Button(c, "forward"),
-		}
+		markup          = b.NewMarkup()
+		navButtons      []tele.InlineButton
+		categoryButtons [][]tele.InlineButton
 	)
 
-	row = append(row, navBtn...)
-	markup.Inline(markup.Split(2, row)...)
+	for _, v := range list {
+		button := tele.InlineButton{
+			Unique: "category",
+			Data:   v.Category,
+			Text:   v.Category,
+		}
 
-	return c.Send(
+		categoryButtons = append(categoryButtons, []tele.InlineButton{button})
+	}
+
+	row := tele.Row{
+		*b.Button(c, "back", page),
+		*b.Button(c, "forward", page),
+	}
+
+	for _, row := range row {
+		navButtons = append(navButtons, tele.InlineButton{
+			Unique: row.Unique,
+			Data:   row.Data,
+			Text:   row.Text,
+		})
+	}
+
+	markup.InlineKeyboard = append(markup.InlineKeyboard, categoryButtons...)
+	markup.InlineKeyboard = append(markup.InlineKeyboard, navButtons)
+
+	return c.EditOrSend(
 		b.Text(c, "add_category"),
 		markup,
 	)
 }
 
+func (b Bot) onBackCategory(c tele.Context) error {
+	var (
+		page, _ = strconv.Atoi(c.Data())
+		userID  = c.Sender().ID
+	)
+
+	page -= 1
+	if page < 0 {
+		count, err := b.db.Finances.CategoryCount(userID)
+		if err != nil {
+			return err
+		}
+
+		var (
+			res = float64(count) / 4.0
+			dec = math.Mod(res, 1.0)
+		)
+		if dec == 0.25 || dec == 0.5 || dec == 0.75 {
+			res = math.Ceil(res)
+		}
+		page = int(res)
+	}
+
+	list, err := b.db.Finances.CategoryList(userID, page)
+	if err != nil {
+		return err
+	}
+
+	return b.quickCategories(c, list, page)
+}
+
+func (b Bot) onForwardCategory(c tele.Context) error {
+	var (
+		page, _ = strconv.Atoi(c.Data())
+		userID  = c.Sender().ID
+	)
+	page += 1
+
+	list, err := b.db.Finances.CategoryList(userID, page)
+	if err != nil {
+		return err
+	}
+
+	if len(list) == 0 {
+		list, err = b.db.Finances.CategoryList(userID, 0)
+		if err != nil {
+			return err
+		}
+		page = 0
+	}
+
+	return b.quickCategories(c, list, page)
+}
+
 func (b Bot) onQuickCategory(c tele.Context) error {
 	var (
 		userID   = c.Sender().ID
-		category = c.Args()[1]
+		category = c.Args()[0]
 	)
 
 	finance, err := userCache(userID)
@@ -218,8 +276,8 @@ func (b Bot) onCategory(c tele.Context) error {
 
 	return c.Send(
 		b.Text(c, "subcategory"),
-		//tele.ForceReply,
 		b.Markup(c, "subcategory_menu"),
+		tele.ForceReply,
 	)
 }
 
