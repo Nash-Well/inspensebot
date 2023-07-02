@@ -6,3 +6,7 @@ create table users(
         language        varchar(2)       not null default 'uk',
         state           varchar(32)      not null default ''
 );
+
+-- +goose Down
+
+drop table users;

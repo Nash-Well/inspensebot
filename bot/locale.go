@@ -1,6 +1,8 @@
 package bot
 
-import tele "gopkg.in/telebot.v3"
+import (
+	tele "gopkg.in/telebot.v3"
+)
 
 func (b Bot) onSettings(c tele.Context) error {
 	return c.Send(
@@ -27,7 +29,9 @@ func (b Bot) onLanguage(c tele.Context) error {
 	}
 
 	b.Layout.SetLocale(c, lang)
-	c.Send(b.Text(c, "lang_success"))
 
-	return b.onStart(c)
+	return c.Send(
+		b.Text(c, "lang_success"),
+		b.Markup(c, "menu"),
+	)
 }

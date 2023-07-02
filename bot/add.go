@@ -2,13 +2,16 @@ package bot
 
 import (
 	"errors"
-	"github.com/puzpuzpuz/xsync/v2"
-	tele "gopkg.in/telebot.v3"
-	"inspense-bot/database"
 	"math"
 	"regexp"
 	"strconv"
 	"time"
+
+	"inspense-bot/bot/middle"
+	"inspense-bot/database"
+
+	"github.com/puzpuzpuz/xsync/v2"
+	tele "gopkg.in/telebot.v3"
 )
 
 var finCache = xsync.NewIntegerMapOf[int64, database.Finance]()
@@ -94,10 +97,15 @@ func (b Bot) onDate(c tele.Context) error {
 
 	t, err := time.Parse("02.01.2006", msg)
 	if err != nil {
-		return c.Send(
-			b.Text(c, "error_date"),
-			tele.ForceReply,
-		)
+		t, err = time.Parse("02.01", msg)
+		if err != nil {
+			return c.Send(
+				b.Text(c, "error_date"),
+				tele.ForceReply,
+			)
+		}
+
+		t = t.AddDate(2023, 0, 0)
 	}
 
 	if t.After(time.Now()) {
@@ -114,13 +122,13 @@ func (b Bot) onDate(c tele.Context) error {
 		return err
 	}
 
-	list, err := b.db.Finances.CategoryList(userID, 0)
+	list, err := b.categoryList(c, 0)
 	if err != nil {
 		return err
 	}
 
 	if len(list) > 0 {
-		return b.quickCategories(c, list, 0)
+		return b.quickCategories(c, list)
 	}
 
 	return c.Send(
@@ -129,25 +137,33 @@ func (b Bot) onDate(c tele.Context) error {
 	)
 }
 
-func (b Bot) quickCategories(c tele.Context, list []database.Finance, page int) error {
+func (b Bot) quickCategories(c tele.Context, categories []string) error {
 	var (
 		markup          = b.NewMarkup()
-		navMarkup       = b.Markup(c, "nav_bar", page)
 		categoryButtons [][]tele.InlineButton
+		page            = middle.User(c).GetCache().CategoryPage
+		navMarkup       = b.Markup(c, "nav_bar", page)
 	)
 
-	for _, v := range list {
+	for _, category := range categories {
 		button := tele.InlineButton{
 			Unique: "category",
-			Data:   v.Category,
-			Text:   v.Category,
+			Data:   category,
+			Text:   category,
 		}
 
 		categoryButtons = append(categoryButtons, []tele.InlineButton{button})
 	}
-
 	markup.InlineKeyboard = append(markup.InlineKeyboard, categoryButtons...)
-	markup.InlineKeyboard = append(markup.InlineKeyboard, navMarkup.InlineKeyboard...)
+
+	count, err := b.categoryCount(c.Sender().ID)
+	if err != nil {
+		return err
+	}
+
+	if count > 4 {
+		markup.InlineKeyboard = append(markup.InlineKeyboard, navMarkup.InlineKeyboard...)
+	}
 
 	return c.EditOrSend(
 		b.Text(c, "add_category"),
@@ -156,14 +172,11 @@ func (b Bot) quickCategories(c tele.Context, list []database.Finance, page int) 
 }
 
 func (b Bot) onBackCategory(c tele.Context) error {
-	var (
-		page, _ = strconv.Atoi(c.Data())
-		userID  = c.Sender().ID
-	)
+	page, _ := strconv.Atoi(c.Data())
 
 	page -= 1
 	if page < 0 {
-		count, err := b.db.Finances.CategoryCount(userID)
+		count, err := b.categoryCount(c.Sender().ID)
 		if err != nil {
 			return err
 		}
@@ -173,40 +186,36 @@ func (b Bot) onBackCategory(c tele.Context) error {
 			dec = math.Mod(res, 1.0)
 		)
 		if dec == 0.25 || dec == 0.5 || dec == 0.75 {
-			res = math.Ceil(res)
+			res = math.Floor(res)
+		} else {
+			res -= 1
 		}
+
 		page = int(res)
 	}
 
-	list, err := b.db.Finances.CategoryList(userID, page)
+	list, err := b.categoryList(c, page)
 	if err != nil {
 		return err
 	}
 
-	return b.quickCategories(c, list, page)
+	return b.quickCategories(c, list)
 }
 
 func (b Bot) onForwardCategory(c tele.Context) error {
-	var (
-		page, _ = strconv.Atoi(c.Data())
-		userID  = c.Sender().ID
-	)
+	page, _ := strconv.Atoi(c.Data())
 	page += 1
 
-	list, err := b.db.Finances.CategoryList(userID, page)
+	list, err := b.categoryList(c, page)
 	if err != nil {
 		return err
 	}
 
 	if len(list) == 0 {
-		list, err = b.db.Finances.CategoryList(userID, 0)
-		if err != nil {
-			return err
-		}
-		page = 0
+		list, err = b.categoryList(c, 0)
 	}
 
-	return b.quickCategories(c, list, page)
+	return b.quickCategories(c, list)
 }
 
 func (b Bot) onQuickCategory(c tele.Context) error {
@@ -222,6 +231,10 @@ func (b Bot) onQuickCategory(c tele.Context) error {
 
 	finance.Category = category
 	finCache.Store(userID, finance)
+
+	user := middle.User(c)
+	user.DeleteFromCache("CategoryPage")
+	b.db.Users.SetCache(*user)
 
 	defer c.Delete()
 
@@ -256,6 +269,12 @@ func (b Bot) onCategory(c tele.Context) error {
 
 	finance.Category = msg
 	finCache.Store(userID, finance)
+
+	user := middle.User(c)
+	if user.Exists("CategoryPage") {
+		user.DeleteFromCache("CategoryPage")
+		b.db.Users.SetCache(*user)
+	}
 
 	if err := b.db.Users.SetState(userID, database.StateAddSubCategory); err != nil {
 		return err
@@ -331,7 +350,10 @@ func (b Bot) addFinance(c tele.Context, f database.Finance) error {
 		return err
 	}
 
-	return c.Send(b.Text(c, "fin_added"))
+	return c.Send(
+		b.Text(c, "fin_added"),
+		b.Markup(c, "menu"),
+	)
 }
 
 func userCache(userID int64) (database.Finance, error) {
@@ -341,4 +363,36 @@ func userCache(userID int64) (database.Finance, error) {
 	}
 
 	return finance, nil
+}
+
+func (b Bot) categoryList(c tele.Context, page int) ([]string, error) {
+	user := middle.User(c)
+	user.UpdateCache("CategoryPage", page)
+	b.db.Users.SetCache(*user)
+
+	finance, err := userCache(c.Sender().ID)
+	if err != nil {
+		return nil, err
+	}
+
+	list, err := b.db.Finances.CategoryList(*user, finance)
+	if err != nil {
+		return nil, err
+	}
+
+	return list, nil
+}
+
+func (b Bot) categoryCount(userID int64) (int, error) {
+	finance, err := userCache(userID)
+	if err != nil {
+		return 0, err
+	}
+
+	count, err := b.db.Finances.CategoryCount(finance)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }

@@ -8,8 +8,8 @@ import (
 type (
 	FinanceStorage interface {
 		Create(f Finance) error
-		CategoryCount(userID int64) (int, error)
-		CategoryList(userID int64, page int) ([]Finance, error)
+		CategoryCount(f Finance) (int, error)
+		CategoryList(u User, f Finance) ([]string, error)
 		//List(userID int64) ([]Finance, error)
 		//ByID(id int) (Finance, error)
 	}
@@ -35,13 +35,16 @@ func (db *Finances) Create(f Finance) error {
 	return err
 }
 
-func (db *Finances) CategoryList(userID int64, page int) (f []Finance, err error) {
-	const q = `SELECT category FROM finances WHERE user_id=$1 GROUP BY category ORDER BY category DESC LIMIT 4 OFFSET $2`
+func (db *Finances) CategoryList(u User, f Finance) (c []string, err error) {
+	const q = `SELECT category FROM finances WHERE user_id=$1 AND type=$2 GROUP BY category ORDER BY category DESC LIMIT 4 OFFSET $3`
+	page := u.GetCache().CategoryPage
 	offset := page * 4
-	return f, db.Select(&f, q, userID, offset)
+	return c, db.Select(&c, q, u.ID, f.Type, offset)
 }
 
-func (db *Finances) CategoryCount(userID int64) (c int, _ error) {
-	const q = `SELECT COUNT(*) FROM finances WHERE user_id=$1 GROUP BY category ORDER BY category DESC`
-	return c, db.Get(&c, q, userID)
+func (db *Finances) CategoryCount(f Finance) (c int, _ error) {
+	const q = `SELECT COUNT(*) FROM (
+    				SELECT category FROM finances WHERE user_id = $1 AND type = $2 GROUP BY category
+				) AS categories`
+	return c, db.Get(&c, q, f.UserID, f.Type)
 }

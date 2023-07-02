@@ -3,6 +3,7 @@ package bot
 import (
 	tele "gopkg.in/telebot.v3"
 	"gopkg.in/telebot.v3/layout"
+	"inspense-bot/bot/middle"
 	"inspense-bot/database"
 )
 
@@ -23,10 +24,8 @@ func New(path string, boot BootStrap) (*Bot, error) {
 		return nil, err
 	}
 
-	if cmds, err := b.Commands(); err != nil {
-		if err = b.SetCommands(cmds); err != nil {
-			return nil, err
-		}
+	if err = b.SetCommands(lt.Commands()); err != nil {
+		return nil, err
 	}
 
 	return &Bot{
@@ -38,6 +37,7 @@ func New(path string, boot BootStrap) (*Bot, error) {
 
 func (b *Bot) Start() {
 	// Middleware
+	b.Use(middle.SetUser(b.db))
 	b.Use(b.Middleware("uk", b.localeFunc))
 
 	// Handlers

@@ -2,6 +2,7 @@ package database
 
 import (
 	"github.com/jmoiron/sqlx"
+	"github.com/jmoiron/sqlx/types"
 	"gopkg.in/telebot.v3"
 	"time"
 )
@@ -26,6 +27,7 @@ type (
 		State(id int64) (State, error)
 		SetLanguage(id int64, lang string) error
 		Language(chat Chat) (lang string, err error)
+		SetCache(u User) error
 	}
 
 	Users struct {
@@ -37,15 +39,16 @@ type (
 	}
 
 	User struct {
-		ID        int64     `db:"id,omitempty"`
-		CreatedAt time.Time `db:"created_at,omitempty"`
-		Language  string    `db:"language,omitempty"`
-		State     string    `db:"state,omitempty"`
+		ID        int64          `db:"id,omitempty" json:"id"`
+		CreatedAt time.Time      `db:"created_at,omitempty" json:"createdAt"`
+		Language  string         `db:"language,omitempty" json:"language"`
+		State     string         `db:"state,omitempty" json:"state"`
+		Cache     types.JSONText `db:"cache" json:"cache"`
 	}
 )
 
 func (db Users) ByID(id int64) (u User, _ error) {
-	const q = "SELECT FROM users WHERE id=$1"
+	const q = "SELECT * FROM users WHERE id=$1"
 	return u, db.Get(&u, q, id)
 }
 
@@ -75,4 +78,10 @@ func (db Users) SetLanguage(id int64, lang string) error {
 func (db Users) Language(chat Chat) (lang string, err error) {
 	const q = "SELECT language FROM users WHERE id=$1"
 	return lang, db.Get(&lang, q, chat.Recipient())
+}
+
+func (user *Users) SetCache(u User) error {
+	const query = `UPDATE users SET cache=$1 WHERE id=$2`
+	_, err := user.Exec(query, u.Cache, u.ID)
+	return err
 }

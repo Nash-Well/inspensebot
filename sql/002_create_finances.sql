@@ -1,6 +1,5 @@
 -- +goose Up
 
-
 create table finances (
         id                  serial              primary key,
         user_id             bigint              not null,
@@ -20,3 +19,8 @@ create table recipient (
 
         foreign key (finance_id) references finances (id)
 );
+
+-- +goose Down
+
+drop table finances;
+drop table recipient;

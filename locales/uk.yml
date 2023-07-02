@@ -12,27 +12,27 @@ start: |-
 
   ⁉️ <b>Use Settings to change a language.</b>
   
-  🤝 <b>Давайте розпочнемо!</b>
+  🤝 <b>Давай розпочнемо!</b>
 
 # auxiliary
 add_fin: 'Вибери тип фінансу: '
 add_date: '📅 Введи дату: '
 add_amount: '💵 Введи суму: '
-add_category: '📁 Введіть категорію:'
-subcategory: '❓ Бажаєш внести підкатегорію?'
-add_subcategory: '🔖 Введіть підкатегорію:'
-fin_added: '👌 <b>Успішно внесено у базу</b>'
+add_category: '📁 Введи категорію:'
+subcategory: '❓ Хочеш внести підкатегорію'
+add_subcategory: '🔖 Введи підкатегорію:'
+fin_added: '👌 <b>Успішно внесено</b>'
 lang_success: '🔄 Мову успішно змінено'
-recipient: '<i>Будь ласка відправте квитанцію: </i>'
-recipient_exists: '<b>Чи маєте квитанцію про фінанс?</b>'
+recipient: '<i>Відправ квитанцію: </i>'
+recipient_exists: '<b>Маєш квитанцію?</b>'
 
 # help
 help_lang: '🤔 Вибір мови: '
 
 # errors
-error_date: '🛑 Невірний формат дати <code>dd.mm.yyyy</code>'
-error_number: '🤨 Схоже, що в повідомленні є <b>цифри</b>.'
-error_negative: '🤨 Фінанс не може бути <b>від`ємним</b>!'
+error_date: '🛑 Невірний формат дати <code>dd.mm.(yyyy)</code>'
+error_number: '⛔️ Схоже, що в повідомленні є <b>цифри</b>.'
+error_negative: '⛔️ Фінанс не може бути <b>від`ємним</b>!'
 error_time: '🛑 Не можна вводити дату яка ще <b>не сталась</b>.'
 
 

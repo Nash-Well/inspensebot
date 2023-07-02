@@ -21,18 +21,18 @@ add_amount: '💵 Enter amount: '
 add_category: '📁 Enter category:'
 subcategory: '❓ Do you want to enter subcategory?'
 add_subcategory: '🔖 Enter subcategory:'
-fin_added: '👌 <b>Successfully added into database</b>'
+fin_added: '👌 <b>Successfully added</b>'
 lang_success: '🔄 Language successfully updated'
-recipient: '<i>Send a recipient please: </i>'
+recipient: '<i>Send a recipient: </i>'
 recipient_exists: '<b>Do you have a receipt for the finance?</b>'
 
 # help
 help_lang: '🤔 Language selection: '
 
 # errors
-error_date: '🛑 Wrong format of date <code>dd.mm.yyyy</code>'
-error_number: '🤨 Seems like a <b>number</b>.'
-error_negative: '🤨 Finance can`t be <b>negative</b>!'
+error_date: '🛑 Wrong format of date <code>dd.mm.(yyyy)</code>'
+error_number: '⛔️ Seems like a <b>number</b>.'
+error_negative: '⛔️ Finance can`t be <b>negative</b>!'
 error_time: '🛑 You can`t enter a date which is <b>doesn`t happened</b>.'
 
 # buttons
