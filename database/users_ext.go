@@ -6,8 +6,8 @@ import (
 )
 
 type UserCache struct {
-	CategoryPage    int
-	CategoryMessage int
+	CategoryPage      int
+	CategoryMessageID int
 }
 
 func (user *User) Exists(key string) bool {
@@ -40,7 +40,7 @@ func (user *User) GetCache() (cache UserCache) {
 
 func (user User) CategoryMessage() *tele.Message {
 	return &tele.Message{
-		ID:   user.GetCache().CategoryMessage,
+		ID:   user.GetCache().CategoryMessageID,
 		Chat: &tele.Chat{ID: user.ID},
 	}
 }

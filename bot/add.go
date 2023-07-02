@@ -128,7 +128,7 @@ func (b Bot) onDate(c tele.Context) error {
 	}
 
 	if len(list) > 0 {
-		return b.quickCategories(c, list)
+		return b.construcCategory(c, list)
 	}
 
 	return c.Send(
@@ -137,7 +137,7 @@ func (b Bot) onDate(c tele.Context) error {
 	)
 }
 
-func (b Bot) quickCategories(c tele.Context, categories []string) error {
+func (b Bot) quickCategories(c tele.Context, categories []string) *tele.ReplyMarkup {
 	var (
 		markup          = b.NewMarkup()
 		categoryButtons [][]tele.InlineButton
@@ -158,17 +158,14 @@ func (b Bot) quickCategories(c tele.Context, categories []string) error {
 
 	count, err := b.categoryCount(c.Sender().ID)
 	if err != nil {
-		return err
+		return &tele.ReplyMarkup{}
 	}
 
 	if count > 4 {
 		markup.InlineKeyboard = append(markup.InlineKeyboard, navMarkup.InlineKeyboard...)
 	}
 
-	return c.EditOrSend(
-		b.Text(c, "add_category"),
-		markup,
-	)
+	return markup
 }
 
 func (b Bot) onBackCategory(c tele.Context) error {
@@ -199,7 +196,7 @@ func (b Bot) onBackCategory(c tele.Context) error {
 		return err
 	}
 
-	return b.quickCategories(c, list)
+	return b.construcCategory(c, list, true)
 }
 
 func (b Bot) onForwardCategory(c tele.Context) error {
@@ -215,7 +212,7 @@ func (b Bot) onForwardCategory(c tele.Context) error {
 		list, err = b.categoryList(c, 0)
 	}
 
-	return b.quickCategories(c, list)
+	return b.construcCategory(c, list, true)
 }
 
 func (b Bot) onQuickCategory(c tele.Context) error {
@@ -234,6 +231,7 @@ func (b Bot) onQuickCategory(c tele.Context) error {
 
 	user := middle.User(c)
 	user.DeleteFromCache("CategoryPage")
+	user.DeleteFromCache("CategoryMessageID")
 	b.db.Users.SetCache(*user)
 
 	defer c.Delete()
@@ -272,7 +270,10 @@ func (b Bot) onCategory(c tele.Context) error {
 
 	user := middle.User(c)
 	if user.Exists("CategoryPage") {
+		b.Delete(user.CategoryMessage())
+
 		user.DeleteFromCache("CategoryPage")
+		user.DeleteFromCache("CategoryMessageID")
 		b.db.Users.SetCache(*user)
 	}
 
@@ -395,4 +396,38 @@ func (b Bot) categoryCount(userID int64) (int, error) {
 	}
 
 	return count, nil
+}
+
+func (b Bot) construcCategory(c tele.Context, list []string, edit ...bool) (err error) {
+	var (
+		editing     = len(edit) > 0 && edit[0]
+		user        = middle.User(c)
+		msgCategory *tele.Message
+	)
+
+	if editing {
+		msgCategory = user.CategoryMessage()
+	} else {
+		msgCategory = c.Message()
+	}
+
+	if editing {
+		msgCategory, err = b.Edit(
+			msgCategory,
+			b.Text(c, "add_category"),
+			b.quickCategories(c, list),
+		)
+	} else {
+		msgCategory, err = b.Send(
+			c.Sender(),
+			b.Text(c, "add_category"),
+			b.quickCategories(c, list),
+		)
+	}
+	if err != nil {
+		return err
+	}
+
+	user.UpdateCache("CategoryMessageID", msgCategory.ID)
+	return b.db.Users.SetCache(*user)
 }
