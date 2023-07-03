@@ -13,8 +13,8 @@ create table finances (
 create table recipient (
         id                  serial              primary key,
         finance_id          int                 not null,
-        file_id             varchar             not null default '',
-        media_type          varchar(30)         not null default 'none',
+        media               varchar             not null default '',
+        media_type          varchar(30)         not null default '',
         created_at          timestamp           not null default now(),
 
         foreign key (finance_id) references finances (id)

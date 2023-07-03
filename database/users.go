@@ -80,8 +80,8 @@ func (db Users) Language(chat Chat) (lang string, err error) {
 	return lang, db.Get(&lang, q, chat.Recipient())
 }
 
-func (user *Users) SetCache(u User) error {
+func (db *Users) SetCache(u User) error {
 	const query = `UPDATE users SET cache=$1 WHERE id=$2`
-	_, err := user.Exec(query, u.Cache, u.ID)
+	_, err := db.Exec(query, u.Cache, u.ID)
 	return err
 }

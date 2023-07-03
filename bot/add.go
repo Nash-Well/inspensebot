@@ -28,15 +28,15 @@ func (b Bot) onAdd(c tele.Context) error {
 }
 
 func (b Bot) onType(c tele.Context) error {
-	id := c.Sender().ID
+	userID := c.Sender().ID
 
 	finCache.Store(
-		id,
+		userID,
 		database.Finance{Type: c.Data()},
 	)
 	defer c.Delete()
 
-	if err := b.db.Users.SetState(id, database.StateAddAmount); err != nil {
+	if err := b.db.Users.SetState(userID, database.StateAddAmount); err != nil {
 		return err
 	}
 
@@ -47,17 +47,14 @@ func (b Bot) onType(c tele.Context) error {
 }
 
 func (b Bot) onAmount(c tele.Context) error {
-	var (
-		userID = c.Sender().ID
-		msg    = c.Text()
-	)
+	userID := c.Sender().ID
 
 	finance, err := userCache(userID)
 	if err != nil {
 		return err
 	}
 
-	amount, err := strconv.ParseFloat(msg, 64)
+	amount, err := strconv.ParseFloat(c.Text(), 64)
 	if err != nil {
 		return err
 	}
@@ -86,7 +83,7 @@ func (b Bot) onAmount(c tele.Context) error {
 
 func (b Bot) onDate(c tele.Context) error {
 	var (
-		msg    = c.Text()
+		text   = c.Text()
 		userID = c.Sender().ID
 	)
 
@@ -95,9 +92,9 @@ func (b Bot) onDate(c tele.Context) error {
 		return err
 	}
 
-	t, err := time.Parse("02.01.2006", msg)
+	t, err := time.Parse("02.01.2006", text)
 	if err != nil {
-		t, err = time.Parse("02.01", msg)
+		t, err = time.Parse("02.01", text)
 		if err != nil {
 			return c.Send(
 				b.Text(c, "error_date"),
@@ -137,7 +134,7 @@ func (b Bot) onDate(c tele.Context) error {
 	)
 }
 
-func (b Bot) quickCategories(c tele.Context, categories []string) *tele.ReplyMarkup {
+func (b Bot) quickCategoryMarkup(c tele.Context, categories []string) *tele.ReplyMarkup {
 	var (
 		markup          = b.NewMarkup()
 		categoryButtons [][]tele.InlineButton
@@ -216,17 +213,14 @@ func (b Bot) onForwardCategory(c tele.Context) error {
 }
 
 func (b Bot) onQuickCategory(c tele.Context) error {
-	var (
-		userID   = c.Sender().ID
-		category = c.Args()[0]
-	)
+	userID := c.Sender().ID
 
 	finance, err := userCache(userID)
 	if err != nil {
 		return err
 	}
 
-	finance.Category = category
+	finance.Category = c.Args()[0]
 	finCache.Store(userID, finance)
 
 	user := middle.User(c)
@@ -236,7 +230,7 @@ func (b Bot) onQuickCategory(c tele.Context) error {
 
 	defer c.Delete()
 
-	if err := b.db.Users.SetState(userID, database.StateAddSubCategory); err != nil {
+	if err := b.db.Users.SetState(userID, database.StateIdle); err != nil {
 		return err
 	}
 
@@ -249,8 +243,8 @@ func (b Bot) onQuickCategory(c tele.Context) error {
 
 func (b Bot) onCategory(c tele.Context) error {
 	var (
+		text   = c.Text()
 		userID = c.Sender().ID
-		msg    = c.Text()
 	)
 
 	finance, err := userCache(userID)
@@ -258,14 +252,14 @@ func (b Bot) onCategory(c tele.Context) error {
 		return err
 	}
 
-	if ok := regexp.MustCompile(`\d`).MatchString(msg); ok {
+	if ok := regexp.MustCompile(`\d`).MatchString(text); ok {
 		return c.Send(
 			b.Text(c, "error_number"),
 			tele.ForceReply,
 		)
 	}
 
-	finance.Category = msg
+	finance.Category = text
 	finCache.Store(userID, finance)
 
 	user := middle.User(c)
@@ -277,7 +271,7 @@ func (b Bot) onCategory(c tele.Context) error {
 		b.db.Users.SetCache(*user)
 	}
 
-	if err := b.db.Users.SetState(userID, database.StateAddSubCategory); err != nil {
+	if err := b.db.Users.SetState(userID, database.StateIdle); err != nil {
 		return err
 	}
 
@@ -290,8 +284,8 @@ func (b Bot) onCategory(c tele.Context) error {
 
 func (b Bot) onSubCategory(c tele.Context) error {
 	var (
+		text   = c.Text()
 		userID = c.Sender().ID
-		msg    = c.Text()
 	)
 
 	finance, err := userCache(userID)
@@ -299,55 +293,48 @@ func (b Bot) onSubCategory(c tele.Context) error {
 		return err
 	}
 
-	if ok := regexp.MustCompile(`\d`).MatchString(msg); ok {
+	if ok := regexp.MustCompile(`\d`).MatchString(text); ok {
 		return c.Send(
 			b.Text(c, "error_number"),
 			tele.ForceReply,
 		)
 	}
 
-	finance.Subcategory = msg
+	finance.Subcategory = text
 	finCache.Store(userID, finance)
 
-	return b.addFinance(c, finance)
-	//return c.EditOrSend(
-	//	b.Text(c, "recipient_exists"),
-	//	b.Markup(c, "recipient_menu"),
-	//)
+	return c.EditOrSend(
+		b.Text(c, "recipient_exists"),
+		b.Markup(c, "recipient_menu"),
+	)
 }
 
 func (b Bot) onSubMenu(c tele.Context) error {
-	data := c.Data()
-	finance, err := userCache(c.Sender().ID)
-	if err != nil {
-		return err
-	}
-
-	defer c.Delete()
-
-	switch data {
+	switch c.Data() {
 	case "approval":
+		c.Delete()
+
+		b.db.Users.SetState(c.Sender().ID, database.StateAddSubCategory)
 		return c.Send(
 			b.Text(c, "add_subcategory"),
 			tele.ForceReply,
 		)
 	case "not_apr":
-		return b.addFinance(c, finance)
+		return c.EditOrSend(
+			b.Text(c, "recipient_exists"),
+			b.Markup(c, "recipient_menu"),
+		)
 	default:
 		return nil
 	}
 }
 
 func (b Bot) addFinance(c tele.Context, f database.Finance) error {
-	var (
-		userID = c.Sender().ID
-	)
-
-	if err := b.db.Finances.Create(f); err != nil {
+	if _, err := b.db.Finances.Create(f); err != nil {
 		return err
 	}
 
-	if err := b.db.Users.SetState(userID, database.StateIdle); err != nil {
+	if err := b.db.Users.SetState(c.Sender().ID, database.StateIdle); err != nil {
 		return err
 	}
 
@@ -415,13 +402,13 @@ func (b Bot) construcCategory(c tele.Context, list []string, edit ...bool) (err 
 		msgCategory, err = b.Edit(
 			msgCategory,
 			b.Text(c, "add_category"),
-			b.quickCategories(c, list),
+			b.quickCategoryMarkup(c, list),
 		)
 	} else {
 		msgCategory, err = b.Send(
 			c.Sender(),
 			b.Text(c, "add_category"),
-			b.quickCategories(c, list),
+			b.quickCategoryMarkup(c, list),
 		)
 	}
 	if err != nil {

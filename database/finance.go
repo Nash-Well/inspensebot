@@ -7,7 +7,7 @@ import (
 
 type (
 	FinanceStorage interface {
-		Create(f Finance) error
+		Create(f Finance) (int, error)
 		CategoryCount(f Finance) (int, error)
 		CategoryList(u User, f Finance) ([]string, error)
 		//List(userID int64) ([]Finance, error)
@@ -19,7 +19,6 @@ type (
 	}
 
 	Finance struct {
-		ID          int       `db:"id"`
 		UserID      int64     `db:"user_id,omitempty"`
 		Type        string    `db:"type,omitempty"`
 		Date        time.Time `db:"date,omitempty"`
@@ -29,10 +28,11 @@ type (
 	}
 )
 
-func (db *Finances) Create(f Finance) error {
-	const q = `INSERT INTO finances(user_id, type, date, amount, category, subcategory) VALUES ($1, $2, $3, $4, $5, $6)`
-	_, err := db.Exec(q, f.UserID, f.Type, f.Date, f.Amount, f.Category, f.Subcategory)
-	return err
+func (db *Finances) Create(f Finance) (int, error) {
+	const q = `INSERT INTO finances(user_id, type, date, amount, category, subcategory) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
+	var id int
+	err := db.QueryRow(q, f.UserID, f.Type, f.Date, f.Amount, f.Category, f.Subcategory).Scan(&id)
+	return id, err
 }
 
 func (db *Finances) CategoryList(u User, f Finance) (c []string, err error) {

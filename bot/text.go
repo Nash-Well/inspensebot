@@ -39,26 +39,14 @@ func (b Bot) deleteWithReply(c tele.Context) error {
 }
 
 func (b Bot) onMedia(c tele.Context) error {
-	var (
-		mediaType = c.Message().Media().MediaType()
-		mediaID   = c.Message().Media().MediaFile().FileID
-	)
+	state, err := b.db.Users.State(c.Sender().ID)
+	if err != nil {
+		return nil
+	}
 
-	defer b.db.Users.SetState(c.Sender().ID, database.StateIdle)
-
-	switch mediaType {
-	case "photo":
-		_, err := b.Send(
-			c.Chat(),
-			&tele.Photo{File: tele.File{FileID: mediaID}},
-		)
-		return err
-	case "document":
-		_, err := b.Send(
-			c.Chat(),
-			&tele.Document{File: tele.File{FileID: mediaID}},
-		)
-		return err
+	switch state {
+	case database.StateAddMedia:
+		return b.onAddMedia(c)
 	default:
 		return nil
 	}

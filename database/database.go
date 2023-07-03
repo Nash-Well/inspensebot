@@ -8,8 +8,9 @@ import (
 
 type DB struct {
 	*sqlx.DB
-	Users    UserStorage
-	Finances FinanceStorage
+	Users      UserStorage
+	Finances   FinanceStorage
+	Recipients RecipientStorage
 }
 
 func Open(url string) (*DB, error) {
@@ -19,9 +20,10 @@ func Open(url string) (*DB, error) {
 	}
 
 	return &DB{
-		DB:       db,
-		Users:    &Users{DB: db},
-		Finances: &Finances{DB: db},
+		DB:         db,
+		Users:      &Users{DB: db},
+		Finances:   &Finances{DB: db},
+		Recipients: &Recipients{DB: db},
 	}, nil
 }
 
