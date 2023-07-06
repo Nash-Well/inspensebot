@@ -226,7 +226,7 @@ func (b Bot) onQuickCategory(c tele.Context) error {
 	user := middle.User(c)
 	user.DeleteFromCache("CategoryPage")
 	user.DeleteFromCache("CategoryMessageID")
-	b.db.Users.SetCache(*user)
+	b.db.Users.SetCache(user)
 
 	defer c.Delete()
 
@@ -268,7 +268,7 @@ func (b Bot) onCategory(c tele.Context) error {
 
 		user.DeleteFromCache("CategoryPage")
 		user.DeleteFromCache("CategoryMessageID")
-		b.db.Users.SetCache(*user)
+		b.db.Users.SetCache(user)
 	}
 
 	if err := b.db.Users.SetState(userID, database.StateIdle); err != nil {
@@ -356,14 +356,14 @@ func userCache(userID int64) (database.Finance, error) {
 func (b Bot) categoryList(c tele.Context, page int) ([]string, error) {
 	user := middle.User(c)
 	user.UpdateCache("CategoryPage", page)
-	b.db.Users.SetCache(*user)
+	b.db.Users.SetCache(user)
 
 	finance, err := userCache(c.Sender().ID)
 	if err != nil {
 		return nil, err
 	}
 
-	list, err := b.db.Finances.CategoryList(*user, finance)
+	list, err := b.db.Finances.CategoryList(user, finance)
 	if err != nil {
 		return nil, err
 	}
@@ -416,5 +416,5 @@ func (b Bot) construcCategory(c tele.Context, list []string, edit ...bool) (err 
 	}
 
 	user.UpdateCache("CategoryMessageID", msgCategory.ID)
-	return b.db.Users.SetCache(*user)
+	return b.db.Users.SetCache(user)
 }

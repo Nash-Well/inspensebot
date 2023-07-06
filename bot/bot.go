@@ -43,21 +43,31 @@ func (b *Bot) Start() {
 	// Handlers
 	b.Handle("/start", b.onStart)
 	b.Handle("/add", b.onAdd)
+	b.Handle("/list", b.onList)
 	b.Handle(tele.OnText, b.onText)
 	b.Handle(tele.OnMedia, b.onMedia)
 
 	// Callbacks
 	b.Handle(b.Callback("lang"), b.onLanguage)
+
 	b.Handle(b.Callback("fin_type"), b.onType)
-	b.Handle(b.Callback("category"), b.onQuickCategory)
 	b.Handle(b.Callback("subcat"), b.onSubMenu)
+
 	b.Handle(b.Callback("recipient"), b.onRecipient)
 	b.Handle(b.Callback("cancel"), b.onCancel)
+
+	b.Handle(b.Callback("category"), b.onQuickCategory)
 	b.Handle(b.Callback("back"), b.onBackCategory)
 	b.Handle(b.Callback("forward"), b.onForwardCategory)
 
+	b.Handle(b.Callback("list_back"), b.onBackList)
+	b.Handle(b.Callback("list_forward"), b.onForwardList)
+	b.Handle(b.Callback("list_func"), b.onFunctions)
+	b.Handle(b.Callback("back_to_list"), b.onBackToList)
+
 	for _, locale := range b.Locales() {
 		b.Handle(b.ButtonLocale(locale, "add"), b.onAdd)
+		b.Handle(b.ButtonLocale(locale, "list"), b.onList)
 		b.Handle(b.ButtonLocale(locale, "settings"), b.onSettings)
 	}
 

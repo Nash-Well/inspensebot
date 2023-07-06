@@ -27,7 +27,7 @@ type (
 		State(id int64) (State, error)
 		SetLanguage(id int64, lang string) error
 		Language(chat Chat) (lang string, err error)
-		SetCache(u User) error
+		SetCache(u *User) error
 	}
 
 	Users struct {
@@ -80,7 +80,7 @@ func (db Users) Language(chat Chat) (lang string, err error) {
 	return lang, db.Get(&lang, q, chat.Recipient())
 }
 
-func (db *Users) SetCache(u User) error {
+func (db *Users) SetCache(u *User) error {
 	const query = `UPDATE users SET cache=$1 WHERE id=$2`
 	_, err := db.Exec(query, u.Cache, u.ID)
 	return err

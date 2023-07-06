@@ -26,6 +26,43 @@ lang_success: '🔄 Language successfully updated'
 recipient: '<i>Send a recipient: </i>'
 recipient_exists: '<b>Do you have a receipt for the finance?</b>'
 
+# List
+list_no_finances: |-
+  You haven't made any finances yet. 🙁
+  
+  Use command /add or <b>'Add finance'</b> button in menu.
+
+list_single_record: |-
+  You have a single finance you should make more to use a navigation menu.
+
+list: |-
+  <b>{{ .Date.Format "2006.01.02" }}</b>
+  {{ .Type }}: <b>{{ .Amount }}</b>
+  Category: <i>{{ .Category }}</i>
+  {{ if ne .Subcategory `` }}Subcategory: <i>{{ .Subcategory }}</i>{{ end }}
+
+list_ext: |-
+  <b>{{ .Date.Format "2006.01.02" }}</b>
+  {{ .Type }}: <b>{{ .Amount }}</b>
+  Category: <i>{{ .Category }}</i>
+  {{ if ne .Subcategory `` }}Subcategory: <i>{{ .Subcategory }}</i>{{ end }}
+  {{ if ne .MediaCaption `` }}<b>Caption for recipient:</b> {{ .MediaCaption }}{{ end }}
+
+list_actions: |-
+  This finance is for <b>{{ .Date.Format "2006.01.02" }}</b>
+  
+  <b>Additional actions with finance?</b>
+
+list_edit_type_expense: 'Expense → Income'
+list_edit_type_income: 'Income → Expense'
+list_edit_amount: 'Edit amount'
+list_edit_category: 'Edit category'
+list_add_subcategory: 'Add subcategory'
+list_edit_subcategory: 'Edit subcategory'
+list_add_recipient: 'Add recipient'
+list_edit_recipient: 'Edit recipient'
+back_to_list: '← Back'
+
 # help
 help_lang: '🤔 Language selection: '
 
@@ -38,6 +75,7 @@ error_time: '🛑 You can`t enter a date which is <b>doesn`t happened</b>.'
 # buttons
 btn_add: '⌨️ Add Finance'
 btn_settings: '⚙️ Settings'
+btn_list: '📋 List of finances'
 btn_inc: '📈 Income'
 btn_exp: '📉 Expense'
 btn_exists: '✅ Exists'
@@ -47,3 +85,4 @@ btn_not_apr: '❌ No'
 btn_forward: 'Forward ➡️'
 btn_back: '⬅️ Back'
 btn_cancel: '🚫 Cancel'
+btn_func: '🤖 Functions'

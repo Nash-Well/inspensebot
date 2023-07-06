@@ -8,6 +8,7 @@ import (
 type (
 	RecipientStorage interface {
 		Add(r Recipient) error
+		ByID(finID int) (Recipient, error)
 	}
 
 	Recipients struct {
@@ -28,4 +29,9 @@ func (db *Recipients) Add(r Recipient) error {
 	const q = `INSERT INTO recipient (finance_id, media, media_type, media_caption) VALUES ($1, $2, $3, $4)`
 	_, err := db.Exec(q, r.FinanceID, r.Media, r.MediaType, r.MediaCaption)
 	return err
+}
+
+func (db *Recipients) ByID(finID int) (r Recipient, _ error) {
+	const q = `SELECT * FROM recipient WHERE finance_id=$1`
+	return r, db.Get(&r, q, finID)
 }

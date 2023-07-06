@@ -6,6 +6,9 @@ import (
 )
 
 type UserCache struct {
+	ListPage          int
+	ListMessageID     int
+	ActionsMessageID  int
 	CategoryPage      int
 	CategoryMessageID int
 }
@@ -36,6 +39,20 @@ func (user *User) DeleteFromCache(key string) {
 func (user *User) GetCache() (cache UserCache) {
 	json.Unmarshal(user.Cache, &cache)
 	return
+}
+
+func (user User) ListMessage() *tele.Message {
+	return &tele.Message{
+		ID:   user.GetCache().ListMessageID,
+		Chat: &tele.Chat{ID: user.ID},
+	}
+}
+
+func (user User) ListActionsMessage() *tele.Message {
+	return &tele.Message{
+		ID:   user.GetCache().ActionsMessageID,
+		Chat: &tele.Chat{ID: user.ID},
+	}
 }
 
 func (user User) CategoryMessage() *tele.Message {

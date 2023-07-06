@@ -6,11 +6,13 @@ settings:
 commands:
   /start: 'Start bot'
   /add: 'Add Finance'
+  /list: 'List of finances'
 
 buttons:
   # reply buttons
   add: '{{ text `btn_add` }}'
   settings: '{{ text `btn_settings` }}'
+  list: '{{ text `btn_list` }}'
 
   #inline
   fin_type: &type
@@ -29,7 +31,6 @@ buttons:
     data: '{{ .Category }}'
     text: '{{ .Category }}'
 
-
   forward:
     unique: forward
     data: '{{ . }}'
@@ -38,6 +39,59 @@ buttons:
     unique: back
     data: '{{ . }}'
     text: '{{ text `btn_back` }}'
+
+  #List
+  list_back:
+    unique: list_back
+    data: '{{ .Page }}'
+    text: '<<'
+  list_func:
+    unique: list_func
+    data: '{{ .Finance.ID }}'
+    text: '{{ text `btn_func` }}'
+  list_forward:
+    unique: list_forward
+    data: '{{ .Page }}'
+    text: '>>'
+
+  list_edit_type:
+    unique: list_edit_type
+    data: '{{ .Finance.ID }}'
+    text: >
+      {{ if eq .Type `Expense` }}
+      {{ text `list_edit_type_expense` }}
+      {{ else }}
+      {{ text `list_edit_type_income` }}
+      {{ end }}
+  list_edit_amount:
+    unique: list_edit_amount
+    data: '{{ .Finance.ID }}'
+    text: '{{ text `list_edit_amount` }}'
+  list_edit_category:
+    unique: list_edit_category
+    data: '{{ .Finance.ID }}'
+    text: '{{ text `list_edit_category` }}'
+  list_add_subcategory:
+    unique: list_add_subcategory
+    data: '{{ .Finance.ID }}'
+    text: >
+      {{ if eq .Subcategory `` }}
+      {{ text `list_add_subcategory` }}
+      {{ else }}
+      {{ text `list_edit_subcategory` }}
+      {{ end }}
+  list_add_recipient:
+    unique: list_add_media
+    data: '{{ .Finance.ID }}'
+    text: >
+      {{ if eq .MediaType `` }}
+      {{ text `list_add_recipient` }}
+      {{ else }}
+      {{ text `list_edit_recipient` }}
+      {{ end }}
+  back_to_list:
+    unique: back_to_list
+    text: '{{ text `back_to_list` }}'
 
   recipient: &recipient
     unique: recipient
@@ -79,6 +133,7 @@ buttons:
 markups:
   menu:
     - [ add ]
+    - [ list ]
     - [ settings ]
 
   lang_menu:
@@ -98,3 +153,15 @@ markups:
 
   cancel_opts:
     - [ cancel ]
+
+  list_menu:
+    - [ list_func ]
+    - [ list_back, list_forward ]
+
+  list_opts:
+    - [ list_edit_type ]
+    - [ list_edit_amount ]
+    - [ list_edit_category ]
+    - [ list_add_subcategory ]
+    - [ list_add_recipient ]
+    - [ back_to_list ]
