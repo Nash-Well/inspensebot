@@ -7,6 +7,7 @@ commands:
   /start: 'Start bot'
   /add: 'Add Finance'
   /list: 'List of finances'
+  /share: 'Share finances'
 
 buttons:
   # reply buttons

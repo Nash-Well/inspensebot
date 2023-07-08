@@ -22,6 +22,8 @@ func (b Bot) onText(c tele.Context) error {
 		return b.onCategory(c)
 	case database.StateAddSubCategory:
 		return b.onSubCategory(c)
+	case database.StateForwardMessage:
+		return b.onForwardMessage(c)
 	default:
 		return nil
 	}

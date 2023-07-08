@@ -17,6 +17,7 @@ const (
 	StateAddCategory    = "adding_category"
 	StateAddSubCategory = "adding_subcategory"
 	StateAddMedia       = "adding_media"
+	StateForwardMessage = "forward_message"
 )
 
 type (

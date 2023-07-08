@@ -63,7 +63,25 @@ list_add_recipient: 'Add recipient'
 list_edit_recipient: 'Edit recipient'
 back_to_list: '← Back'
 
-# help
+# share
+share: |-
+  All you have to do it's <b>forward message</b> from user you want to share your finances.
+  
+  If you want to share specific type write <code>/share type</code>.
+not_forward: |- 
+  The message hasn't been forwarded correctly. Please ensure it is forwarded properly.
+user_not_exist: |-
+  The user you are trying to forward to is not using my service.
+shared: |-
+  You already shared with that user your finances.
+success_share: |-
+  I have just sent a message to the user, informing him that you have granted access to view your financial information.
+share_info: |-
+  You have been granted permission to view the finances of user {{ .FromUserName }} at {{ .CreatedAt.Format "02-01-2006" }}.
+  
+  The type of finances you have been permitted to view is {{ if eq .ShareType `` }}Incomes/Expenses{{ else }}{{ .ShareType }}{{ end }}.
+
+# locale
 help_lang: '🤔 Language selection: '
 
 # errors

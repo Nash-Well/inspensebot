@@ -44,6 +44,7 @@ func (b *Bot) Start() {
 	b.Handle("/start", b.onStart)
 	b.Handle("/add", b.onAdd)
 	b.Handle("/list", b.onList)
+	b.Handle("/share", b.onShare)
 	b.Handle(tele.OnText, b.onText)
 	b.Handle(tele.OnMedia, b.onMedia)
 

@@ -11,6 +11,7 @@ type DB struct {
 	Users      UserStorage
 	Finances   FinanceStorage
 	Recipients RecipientStorage
+	ShareList  ShareListStorage
 }
 
 func Open(url string) (*DB, error) {
@@ -24,6 +25,7 @@ func Open(url string) (*DB, error) {
 		Users:      &Users{DB: db},
 		Finances:   &Finances{DB: db},
 		Recipients: &Recipients{DB: db},
+		ShareList:  &ShareLists{DB: db},
 	}, nil
 }
 
