@@ -2,6 +2,7 @@ package bot
 
 import (
 	tele "gopkg.in/telebot.v3"
+	"inspense-bot/bot/middle"
 	"inspense-bot/database"
 )
 
@@ -12,10 +13,20 @@ func (b Bot) onRecipient(c tele.Context) error {
 	case "exists":
 		b.db.Users.SetState(userID, database.StateAddMedia)
 
-		return c.EditOrSend(
+		c.Delete()
+
+		msgMedia, err := b.Send(
+			c.Sender(),
 			b.Text(c, "recipient"),
 			b.Markup(c, "cancel_opts"),
 		)
+		if err != nil {
+			return err
+		}
+
+		user := middle.User(c)
+		user.UpdateCache("MediaMessageID", msgMedia.ID)
+		return b.db.Users.SetCache(user)
 	case "not_exists":
 		defer b.db.Users.SetState(userID, database.StateIdle)
 		c.Delete()
@@ -33,10 +44,13 @@ func (b Bot) onRecipient(c tele.Context) error {
 }
 
 func (b Bot) onCancel(c tele.Context) error {
-	return c.EditOrSend(
-		b.Text(c, "recipient"),
+	_, err := b.Edit(
+		middle.User(c).MediaMessage(),
+		b.Text(c, "recipient_exists"),
 		b.Markup(c, "recipient_menu"),
 	)
+
+	return err
 }
 
 func (b Bot) onAddMedia(c tele.Context) error {
@@ -49,6 +63,7 @@ func (b Bot) onAddMedia(c tele.Context) error {
 	)
 
 	c.Delete()
+	b.Delete(middle.User(c).MediaMessage())
 
 	finance, err := userCache(userID)
 	if err != nil {

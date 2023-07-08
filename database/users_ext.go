@@ -11,6 +11,7 @@ type UserCache struct {
 	ActionsMessageID  int
 	CategoryPage      int
 	CategoryMessageID int
+	MediaMessageID    int
 }
 
 func (user *User) Exists(key string) bool {
@@ -58,6 +59,13 @@ func (user User) ListActionsMessage() *tele.Message {
 func (user User) CategoryMessage() *tele.Message {
 	return &tele.Message{
 		ID:   user.GetCache().CategoryMessageID,
+		Chat: &tele.Chat{ID: user.ID},
+	}
+}
+
+func (user User) MediaMessage() *tele.Message {
+	return &tele.Message{
+		ID:   user.GetCache().MediaMessageID,
 		Chat: &tele.Chat{ID: user.ID},
 	}
 }
