@@ -80,6 +80,10 @@ share_info: |-
   You have been granted permission to view the finances of user {{ .FromUserName }} at {{ .CreatedAt.Format "02-01-2006" }}.
   
   The type of finances you have been permitted to view is {{ if eq .ShareType `` }}Incomes/Expenses{{ else }}{{ .ShareType }}{{ end }}.
+  
+  Use /view command to see a whole list of permitted finances.
+same_forward: |-
+  You forwarded the message from yourself. It should be forwarded from the user with whom you want to share your finances.
 
 # locale
 help_lang: '🤔 Language selection: '

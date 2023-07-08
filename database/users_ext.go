@@ -13,6 +13,7 @@ type UserCache struct {
 	CategoryMessageID int
 	MediaMessageID    int
 	ShareMessageID    int
+	PayloadType       string
 }
 
 func (user *User) Exists(key string) bool {

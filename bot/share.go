@@ -11,7 +11,11 @@ func (b Bot) onShare(c tele.Context) error {
 	if err := b.sendShareMessage(c, "share"); err != nil {
 		return err
 	}
-	// TODO add a payload which writes into cache or xsync map
+
+	user := middle.User(c)
+	user.UpdateCache("PayloadType", c.Message().Payload)
+	b.db.Users.SetCache(user)
+
 	return b.db.Users.SetState(c.Sender().ID, database.StateForwardMessage)
 }
 
@@ -34,11 +38,16 @@ func (b Bot) onForwardMessage(c tele.Context) error {
 		forward   = orgSender.ID
 	)
 
+	if from == forward {
+		return b.sendShareMessage(c, "same_forward")
+	}
+
 	if _, err := b.db.Users.ByID(forward); err != nil {
-		if _, err := b.db.ShareList.ByID(from, forward); err == nil {
-			return b.sendShareMessage(c, "shared")
-		}
 		return b.sendShareMessage(c, "user_not_exist")
+	}
+
+	if _, err := b.db.ShareList.ByID(from, forward); err == nil {
+		return b.sendShareMessage(c, "shared")
 	}
 
 	info := database.ShareList{
@@ -46,6 +55,7 @@ func (b Bot) onForwardMessage(c tele.Context) error {
 		FromUserName: sender.FirstName,
 		ForwardFrom:  forward,
 		CreatedAt:    time.Now(),
+		ShareType:    user.GetCache().PayloadType,
 	}
 
 	if err := b.db.ShareList.Add(info); err != nil {
