@@ -14,6 +14,7 @@ type UserCache struct {
 	MediaMessageID    int
 	ShareMessageID    int
 	PayloadType       string
+	ViewMessageID     int
 }
 
 func (user *User) Exists(key string) bool {
@@ -75,6 +76,13 @@ func (user User) MediaMessage() *tele.Message {
 func (user User) ShareMessage() *tele.Message {
 	return &tele.Message{
 		ID:   user.GetCache().ShareMessageID,
+		Chat: &tele.Chat{ID: user.ID},
+	}
+}
+
+func (user User) ViewMessage() *tele.Message {
+	return &tele.Message{
+		ID:   user.GetCache().ViewMessageID,
 		Chat: &tele.Chat{ID: user.ID},
 	}
 }

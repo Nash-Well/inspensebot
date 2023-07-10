@@ -85,6 +85,11 @@ share_info: |-
 same_forward: |-
   You forwarded the message from yourself. It should be forwarded from the user with whom you want to share your finances.
 
+# View
+empty_list: 'No one has given you permission to view their finances.'
+view: |-
+  Here is all user(s) ({{ len . }}) who gave you permission to view their finances.
+
 # locale
 help_lang: '🤔 Language selection: '
 

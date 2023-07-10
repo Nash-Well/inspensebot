@@ -3,8 +3,10 @@ package bot
 import (
 	"database/sql"
 	tele "gopkg.in/telebot.v3"
+
 	"inspense-bot/bot/middle"
 	"inspense-bot/database"
+
 	"strconv"
 	"strings"
 )
@@ -84,7 +86,7 @@ func (b Bot) onForwardList(c tele.Context) error {
 func (b Bot) onFunctions(c tele.Context) error {
 	user := middle.User(c)
 
-	finance, err := b.db.Finances.ByOffset(user)
+	finance, err := b.db.Finances.UserByOffset(user)
 	if err != nil {
 		return err
 	}
@@ -136,7 +138,7 @@ func (b Bot) financeExt(c tele.Context, page int) (Finance, error) {
 	user.UpdateCache("ListPage", page)
 	b.db.Users.SetCache(user)
 
-	finance, err := b.db.Finances.ByOffset(user)
+	finance, err := b.db.Finances.UserByOffset(user)
 	if err != nil {
 		return Finance{}, err
 	}
@@ -242,6 +244,16 @@ func (b Bot) Media(c tele.Context, f Finance) tele.Media {
 		}
 	case "document":
 		return &tele.Document{
+			File:    tele.File{FileID: f.Media},
+			Caption: b.Text(c, "list_ext", f),
+		}
+	case "video":
+		return &tele.Video{
+			File:    tele.File{FileID: f.Media},
+			Caption: b.Text(c, "list_ext", f),
+		}
+	case "animation":
+		return &tele.Animation{
 			File:    tele.File{FileID: f.Media},
 			Caption: b.Text(c, "list_ext", f),
 		}

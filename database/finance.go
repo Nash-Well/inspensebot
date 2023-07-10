@@ -10,8 +10,9 @@ type (
 		Create(f Finance) (int, error)
 		CategoryCount(f Finance) (int, error)
 		CategoryList(u *User, f Finance) ([]string, error)
-		ByOffset(u *User) (Finance, error)
+		UserByOffset(u *User) (Finance, error)
 		ListCount(userID int64) (int, error)
+		FinanceByOffset(userID int64, offset int) (Finance, error)
 		//ByID(id int) (Finance, error)
 	}
 
@@ -51,7 +52,7 @@ func (db *Finances) CategoryCount(f Finance) (c int, _ error) {
 	return c, db.Get(&c, q, f.UserID, f.Type)
 }
 
-func (db *Finances) ByOffset(u *User) (f Finance, _ error) {
+func (db *Finances) UserByOffset(u *User) (f Finance, _ error) {
 	const q = `SELECT MAX(id) as id, user_id, type, MAX(date) as date, MAX(amount) as amount, MAX(category) as category,
                MAX(subcategory) as subcategory FROM finances WHERE user_id=$1 GROUP BY user_id, type, category, 
                subcategory ORDER BY type, date,id LIMIT 1 OFFSET $2`
@@ -63,4 +64,11 @@ func (db *Finances) ListCount(userID int64) (c int, _ error) {
 			   MAX(category) as category, MAX(subcategory) as subcategory FROM finances WHERE user_id=$1 
 			   GROUP BY user_id, type, category, subcategory) as count`
 	return c, db.Get(&c, q, userID)
+}
+
+func (db *Finances) FinanceByOffset(userID int64, offset int) (f Finance, _ error) {
+	const q = `SELECT MAX(id) as id, user_id, type, MAX(date) as date, MAX(amount) as amount, MAX(category) as category,
+               MAX(subcategory) as subcategory FROM finances WHERE user_id=$1 GROUP BY user_id, type, category, 
+               subcategory ORDER BY type, date,id LIMIT 1 OFFSET $2`
+	return f, db.Get(&f, q, userID, offset)
 }

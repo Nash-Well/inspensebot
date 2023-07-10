@@ -45,6 +45,8 @@ func (b *Bot) Start() {
 	b.Handle("/add", b.onAdd)
 	b.Handle("/list", b.onList)
 	b.Handle("/share", b.onShare)
+	b.Handle("/view", b.onView)
+
 	b.Handle(tele.OnText, b.onText)
 	b.Handle(tele.OnMedia, b.onMedia)
 
@@ -65,6 +67,11 @@ func (b *Bot) Start() {
 	b.Handle(b.Callback("list_forward"), b.onForwardList)
 	b.Handle(b.Callback("list_func"), b.onFunctions)
 	b.Handle(b.Callback("back_to_list"), b.onBackToList)
+
+	// View
+	b.Handle(b.Callback("from_user"), b.onUser)
+	b.Handle(b.Callback("view_back"), b.onBackView)
+	b.Handle(b.Callback("view_forward"), b.onForwardView)
 
 	for _, locale := range b.Locales() {
 		b.Handle(b.ButtonLocale(locale, "add"), b.onAdd)

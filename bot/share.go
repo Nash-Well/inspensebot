@@ -4,6 +4,7 @@ import (
 	tele "gopkg.in/telebot.v3"
 	"inspense-bot/bot/middle"
 	"inspense-bot/database"
+	"strconv"
 	"time"
 )
 
@@ -86,4 +87,133 @@ func (b Bot) sendShareMessage(c tele.Context, key string) error {
 	user := middle.User(c)
 	user.UpdateCache("ShareMessageID", msgShare.ID)
 	return b.db.Users.SetCache(user)
+}
+
+func (b Bot) onView(c tele.Context) error {
+	list, err := b.db.ShareList.FromList(c.Sender().ID)
+	if err != nil {
+		return err
+	}
+
+	if len(list) == 0 {
+		return c.Send(b.Text(c, "empty_list"))
+	}
+
+	var row tele.Row
+	for _, v := range list {
+		row = append(row, *b.Button(c, "from_user", v))
+	}
+
+	markup := b.NewMarkup()
+	markup.Inline(markup.Split(1, row)...)
+
+	msgView, err := b.Send(
+		c.Sender(),
+		b.Text(c, "view", list),
+		markup,
+	)
+	if err != nil {
+		return err
+	}
+
+	user := middle.User(c)
+	user.UpdateCache("ViewMessageID", msgView.ID)
+	return b.db.Users.SetCache(user)
+}
+
+func (b Bot) onUser(c tele.Context) error {
+	userID, _ := strconv.ParseInt(c.Data(), 10, 64)
+
+	finance, err := b.financeViewExt(userID, 0)
+	if err != nil {
+		return err
+	}
+
+	return b.constructView(c, finance)
+}
+
+func (b Bot) onBackView(c tele.Context) error {
+	var (
+		args      = c.Args()
+		page, _   = strconv.Atoi(args[0])
+		userID, _ = strconv.ParseInt(args[1], 10, 64)
+	)
+
+	page -= 1
+	if page < 0 {
+		count, err := b.db.Finances.ListCount(userID)
+		if err != nil {
+			return err
+		}
+
+		if err := b.ShowAlert(c, count); err != nil {
+			return err
+		}
+
+		if count > 1 {
+			page = count - 1
+		}
+	}
+
+	finance, err := b.financeViewExt(userID, page)
+	if err != nil {
+		return err
+	}
+
+	return b.constructView(c, finance)
+}
+
+func (b Bot) onForwardView(c tele.Context) error {
+	var (
+		args      = c.Args()
+		page, _   = strconv.Atoi(args[0])
+		userID, _ = strconv.ParseInt(args[1], 10, 64)
+	)
+
+	page += 1
+	count, err := b.db.Finances.ListCount(c.Sender().ID)
+	if err != nil {
+		return err
+	}
+
+	if err := b.ShowAlert(c, count); err != nil {
+		return err
+	}
+
+	if count > 1 && page > count-1 {
+		page = 0
+	}
+
+	finance, err := b.financeViewExt(userID, page)
+	if err != nil {
+		return err
+	}
+
+	return b.constructView(c, finance)
+}
+
+func (b Bot) constructView(c tele.Context, finance Finance) (err error) {
+	msgView := middle.User(c).ViewMessage()
+
+	msgView, err = b.Edit(
+		msgView,
+		b.Text(c, "list", finance),
+		b.Markup(c, "view_menu", finance),
+	)
+
+	return
+}
+
+func (b Bot) financeViewExt(userID int64, page int) (Finance, error) {
+	finance, err := b.db.Finances.FinanceByOffset(userID, page)
+	if err != nil {
+		return Finance{}, err
+	}
+
+	f_ext := Finance{
+		Finance: finance,
+		Page:    page,
+	}
+
+	return f_ext, nil
 }

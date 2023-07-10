@@ -143,13 +143,13 @@ func (b Bot) quickCategoryMarkup(c tele.Context, categories []string) *tele.Repl
 	)
 
 	for _, category := range categories {
-		button := tele.InlineButton{
-			Unique: "category",
-			Data:   category,
-			Text:   category,
-		}
-
-		categoryButtons = append(categoryButtons, []tele.InlineButton{button})
+		categoryButtons = append(categoryButtons, []tele.InlineButton{
+			tele.InlineButton{
+				Unique: "category",
+				Data:   category,
+				Text:   category,
+			},
+		})
 	}
 	markup.InlineKeyboard = append(markup.InlineKeyboard, categoryButtons...)
 

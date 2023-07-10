@@ -94,6 +94,20 @@ buttons:
     unique: back_to_list
     text: '{{ text `back_to_list` }}'
 
+  # Share
+  from_user:
+    unique: from_user
+    data: '{{ .FromUser }}'
+    text: '{{ .FromUserName }}'
+  view_back:
+    unique: view_back
+    data: ['{{ .Page }}', '{{ .Finance.UserID }}']
+    text: '<<'
+  view_forward:
+    unique: view_forward
+    data: ['{{ .Page }}', '{{ .Finance.UserID }}']
+    text: '>>'
+
   recipient: &recipient
     unique: recipient
   exists:
@@ -120,6 +134,7 @@ buttons:
     data: not_apr
     text: '{{ text `btn_not_apr` }}'
 
+  # Language
   lang: &lang
     unique: lang
   uk:
@@ -166,3 +181,6 @@ markups:
     - [ list_add_subcategory ]
     - [ list_add_recipient ]
     - [ back_to_list ]
+
+  view_menu:
+    - [ view_back, view_forward ]

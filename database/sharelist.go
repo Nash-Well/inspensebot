@@ -9,6 +9,7 @@ type (
 	ShareListStorage interface {
 		Add(s ShareList) error
 		ByID(from int64, forward int64) (ShareList, error)
+		FromList(userID int64) ([]ShareList, error)
 	}
 
 	ShareLists struct {
@@ -34,4 +35,9 @@ func (db *ShareLists) Add(s ShareList) error {
 func (db *ShareLists) ByID(from int64, forward int64) (s ShareList, _ error) {
 	const q = `SELECT * FROM share_list WHERE from_user=$1 AND forward_from=$2`
 	return s, db.Get(&s, q, from, forward)
+}
+
+func (db *ShareLists) FromList(userID int64) (s []ShareList, _ error) {
+	const q = `SELECT * FROM share_list WHERE forward_from=$1`
+	return s, db.Select(&s, q, userID)
 }
