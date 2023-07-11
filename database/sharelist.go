@@ -24,6 +24,12 @@ type (
 		ShareType    string    `db:"share_type"`
 		CreatedAt    time.Time `db:"created_at"`
 	}
+
+	ViewFinance struct {
+		Finance
+		Page      int
+		ShareType string
+	}
 )
 
 func (db *ShareLists) Add(s ShareList) error {
@@ -38,6 +44,6 @@ func (db *ShareLists) ByID(from int64, forward int64) (s ShareList, _ error) {
 }
 
 func (db *ShareLists) FromList(userID int64) (s []ShareList, _ error) {
-	const q = `SELECT * FROM share_list WHERE forward_from=$1`
+	const q = `SELECT * FROM share_list WHERE from_user=$1`
 	return s, db.Select(&s, q, userID)
 }

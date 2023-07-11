@@ -12,7 +12,7 @@ type (
 		CategoryList(u *User, f Finance) ([]string, error)
 		UserByOffset(u *User) (Finance, error)
 		ListCount(userID int64) (int, error)
-		FinanceByOffset(userID int64, shareType string, offset int) (Finance, error) //TODO: find out why it doesn't want to import package inspense-bot/bot
+		FinanceByOffset(vf ViewFinance) (Finance, error)
 		ViewCount(userID int64, shareType string) (c int, _ error)
 		//ByID(id int) (Finance, error)
 	}
@@ -67,7 +67,7 @@ func (db *Finances) ListCount(userID int64) (c int, _ error) {
 	return c, db.Get(&c, q, userID)
 }
 
-func (db *Finances) FinanceByOffset(userID int64, shareType string, offset int) (f Finance, _ error) {
+func (db *Finances) FinanceByOffset(vf ViewFinance) (f Finance, _ error) {
 	const q = `
 		SELECT MAX(id) AS id, user_id, type, MAX(date) AS date, MAX(amount) AS amount, MAX(category) AS category,
 		MAX(subcategory) AS subcategory	FROM finances WHERE user_id = $1
@@ -79,7 +79,7 @@ func (db *Finances) FinanceByOffset(userID int64, shareType string, offset int) 
 		ORDER BY type, date, id
 		LIMIT 1 OFFSET $3;
    `
-	return f, db.Get(&f, q, userID, shareType, offset)
+	return f, db.Get(&f, q, vf.UserID, vf.ShareType, vf.Page)
 }
 
 func (db *Finances) ViewCount(userID int64, shareType string) (c int, _ error) {

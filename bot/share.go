@@ -9,12 +9,6 @@ import (
 	"time"
 )
 
-type ViewFinance struct {
-	database.Finance
-	Page      int
-	ShareType string
-}
-
 func (b Bot) onShare(c tele.Context) error {
 	if err := b.sendShareMessage(c, "share"); err != nil {
 		return err
@@ -204,7 +198,7 @@ func (b Bot) onForwardView(c tele.Context) error {
 	return b.constructView(c, finance)
 }
 
-func (b Bot) constructView(c tele.Context, finance ViewFinance) (err error) {
+func (b Bot) constructView(c tele.Context, finance database.ViewFinance) (err error) {
 	_, err = b.Edit(
 		middle.User(c).ViewMessage(),
 		b.Text(c, "list", finance),
@@ -214,18 +208,20 @@ func (b Bot) constructView(c tele.Context, finance ViewFinance) (err error) {
 	return
 }
 
-func (b Bot) financeViewExt(userID int64, shareType string, page int) (ViewFinance, error) {
-	finance, err := b.db.Finances.FinanceByOffset(userID, shareType, page)
-	if err != nil {
-		return ViewFinance{}, err
-	}
-	finance.Type = strings.Title(finance.Type)
-
-	f_ext := ViewFinance{
-		Finance:   finance,
+func (b Bot) financeViewExt(userID int64, shareType string, page int) (database.ViewFinance, error) {
+	f_ext := database.ViewFinance{
+		Finance:   database.Finance{UserID: userID},
 		Page:      page,
 		ShareType: shareType,
 	}
+
+	finance, err := b.db.Finances.FinanceByOffset(f_ext)
+	if err != nil {
+		return database.ViewFinance{}, err
+	}
+	finance.Type = strings.Title(finance.Type)
+
+	f_ext.Finance = finance
 
 	return f_ext, nil
 }
