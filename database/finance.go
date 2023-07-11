@@ -12,7 +12,8 @@ type (
 		CategoryList(u *User, f Finance) ([]string, error)
 		UserByOffset(u *User) (Finance, error)
 		ListCount(userID int64) (int, error)
-		FinanceByOffset(userID int64, offset int) (Finance, error)
+		FinanceByOffset(userID int64, shareType string, offset int) (Finance, error) //TODO: find out why it doesn't want to import package inspense-bot/bot
+		ViewCount(userID int64, shareType string) (c int, _ error)
 		//ByID(id int) (Finance, error)
 	}
 
@@ -66,9 +67,32 @@ func (db *Finances) ListCount(userID int64) (c int, _ error) {
 	return c, db.Get(&c, q, userID)
 }
 
-func (db *Finances) FinanceByOffset(userID int64, offset int) (f Finance, _ error) {
-	const q = `SELECT MAX(id) as id, user_id, type, MAX(date) as date, MAX(amount) as amount, MAX(category) as category,
-               MAX(subcategory) as subcategory FROM finances WHERE user_id=$1 GROUP BY user_id, type, category, 
-               subcategory ORDER BY type, date,id LIMIT 1 OFFSET $2`
-	return f, db.Get(&f, q, userID, offset)
+func (db *Finances) FinanceByOffset(userID int64, shareType string, offset int) (f Finance, _ error) {
+	const q = `
+		SELECT MAX(id) AS id, user_id, type, MAX(date) AS date, MAX(amount) AS amount, MAX(category) AS category,
+		MAX(subcategory) AS subcategory	FROM finances WHERE user_id = $1
+		AND (
+   		($2 = '' AND type IN ('income', 'expense'))
+   		OR type = $2
+   		)
+		GROUP BY user_id, type, category, subcategory
+		ORDER BY type, date, id
+		LIMIT 1 OFFSET $3;
+   `
+	return f, db.Get(&f, q, userID, shareType, offset)
+}
+
+func (db *Finances) ViewCount(userID int64, shareType string) (c int, _ error) {
+	const q = `
+		SELECT COUNT(*) FROM
+		(SELECT MAX(id) AS id, user_id, type, MAX(date) AS date, MAX(amount) AS amount, MAX(category) AS category, 
+		MAX(subcategory) AS subcategory	FROM finances WHERE user_id = $1 
+		AND (
+   		($2 = '' AND type IN ('income', 'expense'))
+   		OR type = $2
+   		)
+		GROUP BY user_id, type, category, subcategory
+		ORDER BY type, date, id) as count
+	`
+	return c, db.Get(&c, q, userID, shareType)
 }

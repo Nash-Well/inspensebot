@@ -97,15 +97,15 @@ buttons:
   # Share
   from_user:
     unique: from_user
-    data: '{{ .FromUser }}'
+    data: ['{{ .FromUser }}', '{{ .ShareType }}']
     text: '{{ .FromUserName }}'
   view_back:
     unique: view_back
-    data: ['{{ .Page }}', '{{ .Finance.UserID }}']
+    data: ['{{ .Page }}', '{{ .Finance.UserID }}', '{{ .ShareType }}']
     text: '<<'
   view_forward:
     unique: view_forward
-    data: ['{{ .Page }}', '{{ .Finance.UserID }}']
+    data: ['{{ .Page }}', '{{ .Finance.UserID }}', '{{ .ShareType }}']
     text: '>>'
 
   recipient: &recipient

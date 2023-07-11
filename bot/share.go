@@ -5,8 +5,15 @@ import (
 	"inspense-bot/bot/middle"
 	"inspense-bot/database"
 	"strconv"
+	"strings"
 	"time"
 )
+
+type ViewFinance struct {
+	database.Finance
+	Page      int
+	ShareType string
+}
 
 func (b Bot) onShare(c tele.Context) error {
 	if err := b.sendShareMessage(c, "share"); err != nil {
@@ -122,9 +129,12 @@ func (b Bot) onView(c tele.Context) error {
 }
 
 func (b Bot) onUser(c tele.Context) error {
-	userID, _ := strconv.ParseInt(c.Data(), 10, 64)
+	var (
+		args      = c.Args()
+		userID, _ = strconv.ParseInt(args[0], 10, 64)
+	)
 
-	finance, err := b.financeViewExt(userID, 0)
+	finance, err := b.financeViewExt(userID, args[1], 0)
 	if err != nil {
 		return err
 	}
@@ -137,11 +147,12 @@ func (b Bot) onBackView(c tele.Context) error {
 		args      = c.Args()
 		page, _   = strconv.Atoi(args[0])
 		userID, _ = strconv.ParseInt(args[1], 10, 64)
+		shareType = args[2]
 	)
 
 	page -= 1
 	if page < 0 {
-		count, err := b.db.Finances.ListCount(userID)
+		count, err := b.db.Finances.ViewCount(userID, shareType)
 		if err != nil {
 			return err
 		}
@@ -155,7 +166,7 @@ func (b Bot) onBackView(c tele.Context) error {
 		}
 	}
 
-	finance, err := b.financeViewExt(userID, page)
+	finance, err := b.financeViewExt(userID, shareType, page)
 	if err != nil {
 		return err
 	}
@@ -168,10 +179,11 @@ func (b Bot) onForwardView(c tele.Context) error {
 		args      = c.Args()
 		page, _   = strconv.Atoi(args[0])
 		userID, _ = strconv.ParseInt(args[1], 10, 64)
+		shareType = args[2]
 	)
 
 	page += 1
-	count, err := b.db.Finances.ListCount(c.Sender().ID)
+	count, err := b.db.Finances.ViewCount(userID, shareType)
 	if err != nil {
 		return err
 	}
@@ -184,7 +196,7 @@ func (b Bot) onForwardView(c tele.Context) error {
 		page = 0
 	}
 
-	finance, err := b.financeViewExt(userID, page)
+	finance, err := b.financeViewExt(userID, args[2], page)
 	if err != nil {
 		return err
 	}
@@ -192,11 +204,9 @@ func (b Bot) onForwardView(c tele.Context) error {
 	return b.constructView(c, finance)
 }
 
-func (b Bot) constructView(c tele.Context, finance Finance) (err error) {
-	msgView := middle.User(c).ViewMessage()
-
-	msgView, err = b.Edit(
-		msgView,
+func (b Bot) constructView(c tele.Context, finance ViewFinance) (err error) {
+	_, err = b.Edit(
+		middle.User(c).ViewMessage(),
 		b.Text(c, "list", finance),
 		b.Markup(c, "view_menu", finance),
 	)
@@ -204,15 +214,17 @@ func (b Bot) constructView(c tele.Context, finance Finance) (err error) {
 	return
 }
 
-func (b Bot) financeViewExt(userID int64, page int) (Finance, error) {
-	finance, err := b.db.Finances.FinanceByOffset(userID, page)
+func (b Bot) financeViewExt(userID int64, shareType string, page int) (ViewFinance, error) {
+	finance, err := b.db.Finances.FinanceByOffset(userID, shareType, page)
 	if err != nil {
-		return Finance{}, err
+		return ViewFinance{}, err
 	}
+	finance.Type = strings.Title(finance.Type)
 
-	f_ext := Finance{
-		Finance: finance,
-		Page:    page,
+	f_ext := ViewFinance{
+		Finance:   finance,
+		Page:      page,
+		ShareType: shareType,
 	}
 
 	return f_ext, nil
