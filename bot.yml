@@ -95,10 +95,15 @@ buttons:
     text: '{{ text `back_to_list` }}'
 
   # Share
-  from_user:
-    unique: from_user
+  forward_user:
+    unique: forward_user
     data: ['{{ .FromUser }}', '{{ .ShareType }}']
     text: '{{ .FromUserName }}'
+  from_user:
+    unique: from_user
+    data: '{{ .ForwardFrom }}'
+    text: '{{ .ForwardUserName }}'
+
   view_back:
     unique: view_back
     data: ['{{ .Page }}', '{{ .Finance.UserID }}', '{{ .ShareType }}']

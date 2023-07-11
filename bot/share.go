@@ -53,11 +53,12 @@ func (b Bot) onForwardMessage(c tele.Context) error {
 	}
 
 	info := database.ShareList{
-		FromUser:     from,
-		FromUserName: sender.FirstName,
-		ForwardFrom:  forward,
-		CreatedAt:    time.Now(),
-		ShareType:    user.GetCache().PayloadType,
+		FromUser:        from,
+		FromUserName:    sender.FirstName,
+		ForwardFrom:     forward,
+		ForwardUserName: orgSender.FirstName,
+		CreatedAt:       time.Now(),
+		ShareType:       user.GetCache().PayloadType,
 	}
 
 	if err := b.db.ShareList.Add(info); err != nil {
@@ -91,18 +92,18 @@ func (b Bot) sendShareMessage(c tele.Context, key string) error {
 }
 
 func (b Bot) onView(c tele.Context) error {
-	list, err := b.db.ShareList.FromList(c.Sender().ID)
+	list, err := b.db.ShareList.ForwardList(c.Sender().ID)
 	if err != nil {
 		return err
 	}
 
 	if len(list) == 0 {
-		return c.Send(b.Text(c, "empty_list"))
+		return c.Send(b.Text(c, "view_empty_list"))
 	}
 
 	var row tele.Row
 	for _, v := range list {
-		row = append(row, *b.Button(c, "from_user", v))
+		row = append(row, *b.Button(c, "forward_user", v))
 	}
 
 	markup := b.NewMarkup()
@@ -196,6 +197,38 @@ func (b Bot) onForwardView(c tele.Context) error {
 	}
 
 	return b.constructView(c, finance)
+}
+
+func (b Bot) onDeny(c tele.Context) error {
+	list, err := b.db.ShareList.FromList(c.Sender().ID)
+	if err != nil {
+		return err
+	}
+
+	if len(list) == 0 {
+		return c.Send(b.Text(c, "deny_empty_list"))
+	}
+
+	var row tele.Row
+	for _, v := range list {
+		row = append(row, *b.Button(c, "from_user", v))
+	}
+
+	markup := b.NewMarkup()
+	markup.Inline(markup.Split(1, row)...)
+
+	return c.Send(
+		b.Text(c, "deny"),
+		markup,
+	)
+}
+
+func (b Bot) onUserDeny(c tele.Context) error {
+	if err := b.db.ShareList.DeleteFromList(c.Sender().ID); err != nil {
+		return err
+	}
+
+	return c.EditOrSend(b.Text(c, "denied"))
 }
 
 func (b Bot) constructView(c tele.Context, finance database.ViewFinance) (err error) {

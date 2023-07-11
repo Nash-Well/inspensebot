@@ -76,8 +76,10 @@ shared: |-
   You already shared with that user your finances.
 success_share: |-
   I have just sent a message to the user, informing him that you have granted access to view your financial information.
+  
+  You can use the /deny command to remove the user with whom you have shared finances.
 share_info: |-
-  You have been granted permission to view the finances of user {{ .FromUserName }} at {{ .CreatedAt.Format "02-01-2006" }}.
+  You have been granted permission to view the finances of user {{ .FromUserName }} at {{ .CreatedAt.Format "02-01-2006, 15:04" }}.
   
   The type of finances you have been permitted to view is {{ if eq .ShareType `` }}Incomes/Expenses{{ else }}{{ .ShareType }}{{ end }}.
   
@@ -86,9 +88,15 @@ same_forward: |-
   You forwarded the message from yourself. It should be forwarded from the user with whom you want to share your finances.
 
 # View
-empty_list: 'No one has given you permission to view their finances.'
+view_empty_list: 'No one has given you permission to view their finances.'
 view: |-
-  Here is all user(s) ({{ len . }}) who gave you permission to view their finances.
+  Here is all users ({{ len . }}) who gave you permission to view their finances.
+
+# Deny
+deny_empty_list: |-
+  You haven't given anyone access to your finances.
+deny: 'Here is a list of all the users for whom you have granted permission to view your finances.'
+denied: 'The user has been successfully removed from the list, and he is no longer able to view your finances.'
 
 # locale
 help_lang: '🤔 Language selection: '

@@ -1,6 +1,6 @@
 -- +goose Up
 
-alter table recipient add column media_caption varchar default '';
+alter table recipient add column media_caption varchar(128) default '';
 
 -- +goose Down
 
