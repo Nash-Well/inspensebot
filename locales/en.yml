@@ -68,29 +68,29 @@ share: |-
   All you have to do it's <b>forward message</b> from user you want to share your finances.
   
   If you want to share specific type write <code>/share type</code>.
+  
+  Type may be <code>income</code> or <code>expense</code>.
 not_forward: |- 
   The message hasn't been forwarded correctly. Please ensure it is forwarded properly.
-user_not_exist: |-
-  The user you are trying to forward to is not using my service.
-shared: |-
-  You already shared with that user your finances.
+  
+  Or, if the user from whom you're trying to forward a message has set the property <b>"Forward Message"</b> to <b>"No one"</b>.
+user_not_exist: 'The user you are trying to forward to is not using my service.'
+shared: 'You already shared with that user your finances.'
 success_share: |-
   I have just sent a message to the user, informing him that you have granted access to view your financial information.
   
-  You can use the /deny command to remove the user with whom you have shared finances.
+  You also can use the /deny command to remove the user from your share list. They won't see your finances anymore.
 share_info: |-
   You have been granted permission to view the finances of user {{ .FromUserName }} at {{ .CreatedAt.Format "02-01-2006, 15:04" }}.
   
   The type of finances you have been permitted to view is {{ if eq .ShareType `` }}Incomes/Expenses{{ else }}{{ .ShareType }}{{ end }}.
   
   Use /view command to see a whole list of permitted finances.
-same_forward: |-
-  You forwarded the message from yourself. It should be forwarded from the user with whom you want to share your finances.
+same_forward: 'You forwarded the message from <b>yourself</b>. It should be forwarded from the user with whom you want to share your finances.'
 
 # View
 view_empty_list: 'No one has given you permission to view their finances.'
-view: |-
-  Here is all users ({{ len . }}) who gave you permission to view their finances.
+view: 'Here is all users ({{ len . }}) who gave you permission to view their finances.'
 
 # Deny
 deny_empty_list: |-
