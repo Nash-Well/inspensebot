@@ -305,8 +305,8 @@ func (b Bot) onEditRecipient(c tele.Context) error {
 
 func (b Bot) onEditedRecipient(c tele.Context) error {
 	var (
-		text = c.Text()
-		//user 	  = middle.User(c)
+		text      = c.Text()
+		user      = middle.User(c)
 		media     = c.Message().Media()
 		mediaID   = media.MediaFile().FileID
 		mediaType = media.MediaType()
@@ -346,7 +346,10 @@ func (b Bot) onEditedRecipient(c tele.Context) error {
 		Recipient: r,
 	}
 
-	return b.constructListActions(c, f_ext, true)
+	b.Delete(user.ListMessage())
+	b.Delete(user.ListActionsMessage())
+
+	return b.constructListActions(c, f_ext)
 }
 
 func (b Bot) onBackToFinanceActions(c tele.Context) error {
@@ -465,11 +468,15 @@ func (b Bot) constructListActions(c tele.Context, finance Finance, edit ...bool)
 		what = b.Text(c, "list", finance)
 	}
 
-	if editing { //TODO: modify list message caption with a proper parse mode
-		_, err = b.Edit(
-			msgList,
-			what,
-		)
+	if editing {
+		if _, err := b.EditCaption(msgList, b.Text(c, "list_ext", finance)); err != nil {
+			if err == tele.ErrSameMessageContent || err == tele.NewError(400, "", "there is no caption in the message to edit") {
+				_, err = b.Edit(
+					msgList,
+					what,
+				)
+			}
+		}
 	} else {
 		msgList, err = b.Send(
 			c.Sender(),
