@@ -152,8 +152,8 @@ func (b Bot) onBackView(c tele.Context) error {
 			return err
 		}
 
-		if err := b.ShowAlert(c, count); err != nil {
-			return err
+		if count == 1 {
+			return b.ShowAlert(c)
 		}
 
 		if count > 1 {
@@ -183,8 +183,8 @@ func (b Bot) onForwardView(c tele.Context) error {
 		return err
 	}
 
-	if err := b.ShowAlert(c, count); err != nil {
-		return err
+	if count == 1 {
+		return b.ShowAlert(c)
 	}
 
 	if count > 1 && page > count-1 {

@@ -10,14 +10,18 @@ import (
 type State string
 
 const (
-	StateIdle           = ""
-	StateAddType        = "adding_type"
-	StateAddAmount      = "adding_amount"
-	StateAddDate        = "adding_date"
-	StateAddCategory    = "adding_category"
-	StateAddSubCategory = "adding_subcategory"
-	StateAddMedia       = "adding_media"
-	StateForwardMessage = "forward_message"
+	StateIdle            = ""
+	StateAddType         = "adding_type"
+	StateAddAmount       = "adding_amount"
+	StateAddDate         = "adding_date"
+	StateAddCategory     = "adding_category"
+	StateAddSubCategory  = "adding_subcategory"
+	StateAddMedia        = "adding_media"
+	StateForwardMessage  = "forward_message"
+	StateEditAmount      = "edit_amount"
+	StateEditCategory    = "edit_category"
+	StateEditSubCategory = "edit_subcategory"
+	StateEditRecipient   = "edit_recipient"
 )
 
 type (

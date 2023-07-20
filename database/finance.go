@@ -2,19 +2,23 @@ package database
 
 import (
 	"github.com/jmoiron/sqlx"
+
+	"github.com/Masterminds/squirrel"
+
 	"time"
 )
 
 type (
 	FinanceStorage interface {
+		ByID(id int) (Finance, error)
 		Create(f Finance) (int, error)
+		UpdateFinance(id int, f Finance) error
 		CategoryCount(f Finance) (int, error)
 		CategoryList(u *User, f Finance) ([]string, error)
 		UserByOffset(u *User) (Finance, error)
 		ListCount(userID int64) (int, error)
 		FinanceByOffset(vf ViewFinance) (Finance, error)
 		ViewCount(userID int64, shareType string) (c int, _ error)
-		//ByID(id int) (Finance, error)
 	}
 
 	Finances struct {
@@ -32,11 +36,41 @@ type (
 	}
 )
 
+func (db *Finances) ByID(id int) (f Finance, _ error) {
+	const q = `SELECT * FROM finances WHERE id=$1`
+	return f, db.Get(&f, q, id)
+}
+
 func (db *Finances) Create(f Finance) (int, error) {
 	const q = `INSERT INTO finances(user_id, type, date, amount, category, subcategory) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
 	var id int
 	err := db.QueryRow(q, f.UserID, f.Type, f.Date, f.Amount, f.Category, f.Subcategory).Scan(&id)
 	return id, err
+}
+
+func (db *Finances) UpdateFinance(id int, f Finance) error {
+	data := map[string]any{
+
+		"user_id":     f.UserID,
+		"type":        f.Type,
+		"date":        f.Date,
+		"amount":      f.Amount,
+		"category":    f.Category,
+		"subcategory": f.Subcategory,
+	}
+
+	query, args, err := squirrel.
+		Update("finances").
+		SetMap(data).
+		Where(squirrel.Eq{"id": id}).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(query, args...)
+	return err
 }
 
 func (db *Finances) CategoryList(u *User, f Finance) (c []string, err error) {

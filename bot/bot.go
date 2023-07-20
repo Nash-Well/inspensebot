@@ -60,14 +60,24 @@ func (b *Bot) Start() {
 	b.Handle(b.Callback("recipient"), b.onRecipient)
 	b.Handle(b.Callback("cancel"), b.onCancel)
 
+	// Category List
 	b.Handle(b.Callback("category"), b.onQuickCategory)
 	b.Handle(b.Callback("back"), b.onBackCategory)
 	b.Handle(b.Callback("forward"), b.onForwardCategory)
 
+	// List
 	b.Handle(b.Callback("list_back"), b.onBackList)
 	b.Handle(b.Callback("list_forward"), b.onForwardList)
 	b.Handle(b.Callback("list_func"), b.onFunctions)
 	b.Handle(b.Callback("back_to_list"), b.onBackToList)
+
+	// Finance editor
+	b.Handle(b.Callback("list_edit_type"), b.onChangeType)
+	b.Handle(b.Callback("list_edit_amount"), b.onEditAmout)
+	b.Handle(b.Callback("list_edit_category"), b.onEditCategory)
+	b.Handle(b.Callback("list_add_subcategory"), b.onEditSubcategory)
+	b.Handle(b.Callback("list_add_recipient"), b.onEditRecipient)
+	b.Handle(b.Callback("back_to_actions"), b.onBackToFinanceActions)
 
 	// View
 	b.Handle(b.Callback("forward_user"), b.onUser)

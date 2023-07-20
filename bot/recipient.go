@@ -77,13 +77,10 @@ func (b Bot) onAddMedia(c tele.Context) error {
 	defer finCache.Delete(userID)
 
 	r := database.Recipient{
-		FinanceID: id,
-		Media:     mediaID,
-		MediaType: mediaType,
-	}
-
-	if text != "" {
-		r.MediaCaption = text
+		FinanceID:    id,
+		Media:        mediaID,
+		MediaType:    mediaType,
+		MediaCaption: text,
 	}
 
 	if err := b.db.Recipients.Add(r); err != nil {

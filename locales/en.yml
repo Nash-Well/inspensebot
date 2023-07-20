@@ -63,6 +63,15 @@ list_add_recipient: 'Add recipient'
 list_edit_recipient: 'Edit recipient'
 back_to_list: '← Back'
 
+edit_amount: |-
+  Send new amount to update a finance.
+edit_category: |-
+  Send a new category to update a finance.
+edit_subcategory: |-
+  Send{{ if .Subcategory }} a new subcategory to update a finance{{ else }} subcategory to add it to finance{{ end }}.
+edit_recipient: |-
+  Send here a file with type of document or photo.
+
 # share
 share: |-
   All you have to do it's <b>forward message</b> from user you want to share your finances.

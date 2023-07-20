@@ -15,6 +15,7 @@ type UserCache struct {
 	ShareMessageID    int
 	PayloadType       string
 	ViewMessageID     int
+	FinanceID         int
 }
 
 func (user *User) Exists(key string) bool {

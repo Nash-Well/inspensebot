@@ -93,6 +93,10 @@ buttons:
   back_to_list:
     unique: back_to_list
     text: '{{ text `back_to_list` }}'
+  back_to_actions:
+     unique: back_to_actions
+     data: '{{ .ID }}'
+     text: '{{ text `back_to_list` }}'
 
   # Share
   forward_user:
@@ -186,6 +190,9 @@ markups:
     - [ list_add_subcategory ]
     - [ list_add_recipient ]
     - [ back_to_list ]
+
+  back_to_actions:
+    - [ back_to_actions ]
 
   view_menu:
     - [ view_back, view_forward ]

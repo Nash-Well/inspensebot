@@ -24,6 +24,12 @@ func (b Bot) onText(c tele.Context) error {
 		return b.onSubCategory(c)
 	case database.StateForwardMessage:
 		return b.onForwardMessage(c)
+	case database.StateEditAmount:
+		return b.onEditedAmount(c)
+	case database.StateEditCategory:
+		return b.onEditedCategory(c)
+	case database.StateEditSubCategory:
+		return b.onEditedSubcategory(c)
 	default:
 		return nil
 	}
@@ -49,6 +55,8 @@ func (b Bot) onMedia(c tele.Context) error {
 	switch state {
 	case database.StateAddMedia:
 		return b.onAddMedia(c)
+	case database.StateEditRecipient:
+		return b.onEditedRecipient(c)
 	default:
 		return nil
 	}
