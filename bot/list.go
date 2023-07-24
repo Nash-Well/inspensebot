@@ -527,14 +527,14 @@ func (b Bot) constructListActions(c tele.Context, finance Finance, edit ...bool)
 		_, err = b.Edit(
 			msgActions,
 			b.Text(c, "list_actions", finance),
-			b.Markup(c, "list_opts", finance),
+			b.actionMarkup(c, finance),
 		)
 		return err
 	}
 	msgActions, err = b.Send(
 		c.Sender(),
 		b.Text(c, "list_actions", finance),
-		b.Markup(c, "list_opts", finance),
+		b.actionMarkup(c, finance),
 	)
 	if err != nil {
 		return err
@@ -544,6 +544,19 @@ func (b Bot) constructListActions(c tele.Context, finance Finance, edit ...bool)
 	user.UpdateCache("FinanceID", finance.Finance.ID)
 	user.UpdateCache("ActionsMessageID", msgActions.ID)
 	return b.db.Users.SetCache(user)
+}
+
+func (b Bot) actionMarkup(c tele.Context, finance Finance) *tele.ReplyMarkup {
+	markup := b.Markup(c, "list_opts", finance)
+
+	_, ok := searchPref.Load(c.Sender().ID)
+	if !ok {
+		return markup
+	}
+
+	markup.InlineKeyboard = markup.InlineKeyboard[1:]
+
+	return markup
 }
 
 func (b Bot) Media(c tele.Context, f Finance) tele.Media {
