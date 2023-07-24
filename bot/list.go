@@ -18,25 +18,42 @@ type Finance struct {
 }
 
 func (b Bot) onList(c tele.Context) error {
-	finance, err := b.financeExt(c, 0)
+	var (
+		user   = middle.User(c)
+		sender = c.Sender()
+	)
+
+	count, err := b.db.Finances.ListCount(sender.ID)
+	if count == 0 {
+		return c.Send(b.Text(c, "list_no_finances"))
+	}
+
+	msgList, err := b.Send(
+		sender,
+		b.Text(c, "search_type"),
+		b.listMarkup(c),
+	)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return c.Send(
-				b.Text(c, "list_no_finances"),
-			)
-		}
 		return err
 	}
 
-	return b.constructList(c, finance)
+	user.UpdateCache("ListMessageID", msgList.ID)
+	return b.db.Users.SetCache(user)
 }
 
 func (b Bot) onBackList(c tele.Context) error {
-	page, _ := strconv.Atoi(c.Data())
+	var (
+		page, _ = strconv.Atoi(c.Data())
+		userID  = c.Sender().ID
+	)
 
 	page -= 1
 	if page < 0 {
-		count, err := b.db.Finances.ListCount(c.Sender().ID)
+		count, err := b.db.Finances.ListCount(userID)
+		if search, ok := searchPref.Load(userID); ok {
+			count, err = b.db.Finances.SearchCount(userID, search)
+		}
+
 		if err != nil {
 			return err
 		}
@@ -59,10 +76,17 @@ func (b Bot) onBackList(c tele.Context) error {
 }
 
 func (b Bot) onForwardList(c tele.Context) error {
-	page, _ := strconv.Atoi(c.Data())
+	var (
+		page, _ = strconv.Atoi(c.Data())
+		userID  = c.Sender().ID
+	)
 
 	page += 1
-	count, err := b.db.Finances.ListCount(c.Sender().ID)
+	count, err := b.db.Finances.ListCount(userID)
+
+	if search, ok := searchPref.Load(userID); ok {
+		count, err = b.db.Finances.SearchCount(userID, search)
+	}
 	if err != nil {
 		return err
 	}
@@ -318,6 +342,7 @@ func (b Bot) onEditedRecipient(c tele.Context) error {
 	if err != nil {
 		return err
 	}
+	finance.Type = strings.Title(finance.Type)
 
 	_, err = b.db.Recipients.ByID(finance.ID)
 	r := database.Recipient{
@@ -401,9 +426,13 @@ func (b Bot) financeExt(c tele.Context, page int) (Finance, error) {
 	b.db.Users.SetCache(user)
 
 	finance, err := b.db.Finances.UserByOffset(user)
+	if search, ok := searchPref.Load(c.Sender().ID); ok {
+		finance, err = b.db.Finances.SearchByOffset(user, search)
+	}
 	if err != nil {
 		return Finance{}, err
 	}
+
 	finance.Type = strings.Title(finance.Type)
 
 	f_ext := Finance{
@@ -469,13 +498,23 @@ func (b Bot) constructListActions(c tele.Context, finance Finance, edit ...bool)
 	}
 
 	if editing {
-		if _, err := b.EditCaption(msgList, b.Text(c, "list_ext", finance)); err != nil {
-			if err == tele.ErrSameMessageContent || err == tele.NewError(400, "", "there is no caption in the message to edit") {
-				_, err = b.Edit(
-					msgList,
-					what,
-				)
+		if finance.Media == "" {
+			_, err = b.Edit(
+				msgList,
+				what,
+			)
+		} else {
+			if _, err := b.EditCaption(msgList, b.Text(c, "list_ext", finance)); err != nil {
+				if err == tele.ErrSameMessageContent && err == tele.NewError(400, "", "there is no caption in the message to edit") {
+					_, err = b.Edit(
+						msgList,
+						what,
+					)
+				}
 			}
+		}
+		if err != nil {
+			return err
 		}
 	} else {
 		msgList, err = b.Send(

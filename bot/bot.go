@@ -65,6 +65,13 @@ func (b *Bot) Start() {
 	b.Handle(b.Callback("back"), b.onBackCategory)
 	b.Handle(b.Callback("forward"), b.onForwardCategory)
 
+	// List search
+	b.Handle(b.Callback("search_type"), b.onListType)
+	b.Handle(b.Callback("search_numb"), b.onNumb)
+	b.Handle(b.Callback("search_back"), b.onSearchBack)
+	b.Handle(b.Callback("search_done"), b.onSearchDone)
+	b.Handle(b.Callback("search_all"), b.onViewAll)
+
 	// List
 	b.Handle(b.Callback("list_back"), b.onBackList)
 	b.Handle(b.Callback("list_forward"), b.onForwardList)

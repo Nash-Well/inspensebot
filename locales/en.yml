@@ -26,6 +26,16 @@ lang_success: '🔄 Language successfully updated'
 recipient: '<i>Send a recipient: </i>'
 recipient_exists: '<b>Do you have a receipt for the finance?</b>'
 
+# List Search
+search_empty_type: |-
+  You haven't got any finances by that type yet.
+search_type: 'Select an appropriate type: '
+search_year: 'Select year:'
+search_month: 'Select month:'
+search_day: 'Select day:'
+search_back: '⬅️ Back'
+search_done: 'Done ✅'
+
 # List
 list_no_finances: |-
   You haven't made any finances yet. 🙁
@@ -62,6 +72,8 @@ list_edit_subcategory: 'Edit subcategory'
 list_add_recipient: 'Add recipient'
 list_edit_recipient: 'Edit recipient'
 back_to_list: '← Back'
+
+list_btn_all: '🧐 View all finances'
 
 edit_amount: |-
   Send new amount to update a finance.

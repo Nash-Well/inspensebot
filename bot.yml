@@ -41,7 +41,24 @@ buttons:
     data: '{{ . }}'
     text: '{{ text `btn_back` }}'
 
-  #List
+  # List Search
+  search_type:
+    unique: search_type
+  search_numb:
+    unique: search_numb
+    text: '{{ . }}'
+    data: '{{ . }}'
+  search_back:
+    unique: search_back
+    text: '{{ text `search_back` }}'
+  search_done:
+    unique: search_done
+    text: '{{ text `search_done` }}'
+  search_all:
+    unique: search_all
+    text: '{{ text `list_btn_all` }}'
+
+  # List
   list_back:
     unique: list_back
     data: '{{ .Page }}'

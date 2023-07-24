@@ -1,9 +1,9 @@
 package database
 
 import (
-	"github.com/jmoiron/sqlx"
-
 	"github.com/Masterminds/squirrel"
+	"github.com/jmoiron/sqlx"
+	"inspense-bot/bot/types"
 
 	"time"
 )
@@ -19,6 +19,9 @@ type (
 		ListCount(userID int64) (int, error)
 		FinanceByOffset(vf ViewFinance) (Finance, error)
 		ViewCount(userID int64, shareType string) (c int, _ error)
+		SearchByOffset(user *User, search types.Search) (f Finance, _ error)
+		SearchCount(userID int64, search types.Search) (count int, _ error)
+		FinanceDetailed(search types.Search, userID int64) (res []int, _ error)
 	}
 
 	Finances struct {
@@ -50,7 +53,6 @@ func (db *Finances) Create(f Finance) (int, error) {
 
 func (db *Finances) UpdateFinance(id int, f Finance) error {
 	data := map[string]any{
-
 		"user_id":     f.UserID,
 		"type":        f.Type,
 		"date":        f.Date,
@@ -129,4 +131,45 @@ func (db *Finances) ViewCount(userID int64, shareType string) (c int, _ error) {
 		ORDER BY type, date, id) as count
 	`
 	return c, db.Get(&c, q, userID, shareType)
+}
+
+func (db *Finances) FinanceDetailed(search types.Search, userID int64) (res []int, _ error) {
+	const q = `
+		SELECT
+  			CASE
+    			WHEN $1 = 'year' THEN EXTRACT(YEAR FROM date)
+    			WHEN $1 = 'month' THEN EXTRACT(MONTH FROM date)
+    			WHEN $1 = 'day' THEN EXTRACT(DAY FROM date)
+  			END AS result
+		FROM finances WHERE user_id = $3 AND (
+    		($1 = 'year')
+   			OR ($1 = 'month' AND EXTRACT(YEAR FROM date) = $4)
+    		OR ($1 = 'day' AND EXTRACT(YEAR FROM date) = $4 AND EXTRACT(MONTH FROM date) = $5)
+  		) AND type = $2
+		GROUP BY result ORDER BY result DESC;`
+	return res, db.Select(&res, q, search.Search, search.Type, userID, search.Year, search.Month)
+}
+
+func (db *Finances) SearchCount(userID int64, search types.Search) (count int, _ error) {
+	const q = `SELECT COUNT(*) AS record_count
+			   FROM finances WHERE user_id = $3 AND (
+    		   (
+    		   	 $1 = ''
+    			 OR $1 = 'year' AND EXTRACT(YEAR FROM date) = $4)
+    			 OR ($1 = 'month' AND EXTRACT(YEAR FROM date) = $4 AND EXTRACT(MONTH FROM date) = $5)
+    			 OR ($1 = 'day' AND EXTRACT(YEAR FROM date) = $4 AND EXTRACT(MONTH FROM date) = $5 AND EXTRACT(DAY FROM date) = $6)
+  			   ) AND type = $2;
+`
+	return count, db.Get(&count, q, search.Search, search.Type, userID, search.Year, search.Month, search.Day)
+}
+
+func (db *Finances) SearchByOffset(user *User, search types.Search) (f Finance, _ error) {
+	const q = `SELECT * FROM finances WHERE user_id = $3 AND (
+    		   (
+    		     $1 = ''
+    		     OR $1 = 'year' AND EXTRACT(YEAR FROM date) = $4)
+    			 OR ($1 = 'month' AND EXTRACT(YEAR FROM date) = $4 AND EXTRACT(MONTH FROM date) = $5)
+    			 OR ($1 = 'day' AND EXTRACT(YEAR FROM date) = $4 AND EXTRACT(MONTH FROM date) = $5 AND EXTRACT(DAY FROM date) = $6)
+  			   ) AND type = $2 LIMIT 1 OFFSET $7`
+	return f, db.Get(&f, q, search.Search, search.Type, user.ID, search.Year, search.Month, search.Day, user.GetCache().ListPage)
 }
