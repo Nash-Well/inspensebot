@@ -10,28 +10,29 @@ commands:
   /share: 'Share finances'
 
 buttons:
-  # reply buttons
+  # Reply buttons
   add: '{{ text `btn_add` }}'
   settings: '{{ text `btn_settings` }}'
   list: '{{ text `btn_list` }}'
+  report: '{{ text `btn_report` }}'
 
-  #inline
+  # Inline
   fin_type: &type
     unique: type
   inc:
     <<: *type
-    text: '{{ text `btn_inc` }}'
+    text: '📈 {{ text `btn_inc` }}'
     data: income
   exp:
     <<: *type
-    text: '{{ text `btn_exp` }}'
+    text: '📉 {{ text `btn_exp` }}'
     data: expense
 
+  # Category
   category:
     unique: category
     data: '{{ .Category }}'
     text: '{{ .Category }}'
-
   forward:
     unique: forward
     data: '{{ . }}'
@@ -72,6 +73,7 @@ buttons:
     data: '{{ .Page }}'
     text: '>>'
 
+  # List editor
   list_edit_type:
     unique: list_edit_type
     data: '{{ .Finance.ID }}'
@@ -125,6 +127,7 @@ buttons:
     data: '{{ .ForwardFrom }}'
     text: '{{ .ForwardUserName }}'
 
+  # View
   view_back:
     unique: view_back
     data: ['{{ .Page }}', '{{ .Finance.UserID }}', '{{ .ShareType }}']
@@ -134,6 +137,7 @@ buttons:
     data: ['{{ .Page }}', '{{ .Finance.UserID }}', '{{ .ShareType }}']
     text: '>>'
 
+  # Recipient
   recipient: &recipient
     unique: recipient
   exists:
@@ -144,7 +148,6 @@ buttons:
     <<: *recipient
     data: not_exists
     text: '{{ text `btn_not_exists` }}'
-
   cancel:
     unique: cancel
     text: '{{ text `btn_cancel` }}'
@@ -176,7 +179,7 @@ markups:
   menu:
     - [ add ]
     - [ list ]
-    - [ settings ]
+    - [ settings, report ]
 
   lang_menu:
     - [ uk, en ]

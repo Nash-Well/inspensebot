@@ -113,6 +113,9 @@ same_forward: 'You forwarded the message from <b>yourself</b>. It should be forw
 view_empty_list: 'No one has given you permission to view their finances.'
 view: 'Here is all users ({{ len . }}) who gave you permission to view their finances.'
 
+# Report
+report: 'detailed-report'
+
 # Deny
 deny_empty_list: |-
   You haven't given anyone access to your finances.
@@ -132,8 +135,8 @@ error_time: '🛑 You can`t enter a date which is <b>doesn`t happened</b>.'
 btn_add: '⌨️ Add Finance'
 btn_settings: '⚙️ Settings'
 btn_list: '📋 List of finances'
-btn_inc: '📈 Income'
-btn_exp: '📉 Expense'
+btn_inc: 'Income'
+btn_exp: 'Expense'
 btn_exists: '✅ Exists'
 btn_not_exists: '❌ Not exists'
 btn_approval: '✅ Yes'
@@ -142,3 +145,4 @@ btn_forward: 'Forward ➡️'
 btn_back: '⬅️ Back'
 btn_cancel: '🚫 Cancel'
 btn_func: '🤖 Functions'
+btn_report: '📄 Report'

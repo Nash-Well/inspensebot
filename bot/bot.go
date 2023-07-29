@@ -96,6 +96,7 @@ func (b *Bot) Start() {
 		b.Handle(b.ButtonLocale(locale, "add"), b.onAdd)
 		b.Handle(b.ButtonLocale(locale, "list"), b.onList)
 		b.Handle(b.ButtonLocale(locale, "settings"), b.onSettings)
+		b.Handle(b.ButtonLocale(locale, "report"), b.onReport)
 	}
 
 	b.Bot.Start()

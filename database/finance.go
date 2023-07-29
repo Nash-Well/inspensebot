@@ -4,7 +4,6 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
 	"inspense-bot/bot/types"
-
 	"time"
 )
 
@@ -22,6 +21,7 @@ type (
 		SearchByOffset(user *User, search types.Search) (f Finance, _ error)
 		SearchCount(userID int64, search types.Search) (count int, _ error)
 		FinanceDetailed(search types.Search, userID int64) (res []int, _ error)
+		Finances(userID int64, search types.Search) (map[string][]Finance, error)
 	}
 
 	Finances struct {
@@ -172,4 +172,56 @@ func (db *Finances) SearchByOffset(user *User, search types.Search) (f Finance, 
     			 OR ($1 = 'day' AND EXTRACT(YEAR FROM date) = $4 AND EXTRACT(MONTH FROM date) = $5 AND EXTRACT(DAY FROM date) = $6)
   			   ) AND type = $2 LIMIT 1 OFFSET $7`
 	return f, db.Get(&f, q, search.Search, search.Type, user.ID, search.Year, search.Month, search.Day, user.GetCache().ListPage)
+}
+
+func (db *Finances) Finances(userID int64, search types.Search) (map[string][]Finance, error) {
+	const q = `
+		SELECT date, sum(amount) as amount, category
+		FROM finances
+		WHERE user_id = $3 AND (
+			($1 = '' 
+		    OR ($1 = 'year' AND EXTRACT(YEAR FROM date) = $4))
+			OR ($1 = 'month' AND EXTRACT(YEAR FROM date) = $4 AND EXTRACT(MONTH FROM date) = $5)
+			OR ($1 = 'day' AND EXTRACT(YEAR FROM date) = $4 AND EXTRACT(MONTH FROM date) = $5 AND EXTRACT(DAY FROM date) = $6)
+		) AND type = $2 GROUP BY category, date
+		ORDER BY EXTRACT(MONTH FROM date), category ASC`
+
+	rows, err := db.Query(q, search.Search, search.Type, userID, search.Year, search.Month, search.Day)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	financeMap := make(map[string][]Finance)
+
+	for rows.Next() {
+		var (
+			date     time.Time
+			amount   float64
+			category string
+		)
+
+		err := rows.Scan(&date, &amount, &category)
+		if err != nil {
+			return nil, err
+		}
+
+		dateStr := date.Format("01")
+		finance := Finance{
+			Amount:   amount,
+			Category: category,
+			Date:     date,
+		}
+
+		if _, ok := financeMap[dateStr]; !ok {
+			financeMap[dateStr] = []Finance{}
+		}
+		financeMap[dateStr] = append(financeMap[dateStr], finance)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return financeMap, nil
 }

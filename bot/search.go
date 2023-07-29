@@ -1,12 +1,14 @@
 package bot
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"github.com/puzpuzpuz/xsync/v2"
 	tele "gopkg.in/telebot.v3"
 	"inspense-bot/bot/middle"
 	"inspense-bot/bot/types"
+	"inspense-bot/pkg/excel"
 	"strconv"
 	"strings"
 )
@@ -14,9 +16,15 @@ import (
 var searchPref = xsync.NewIntegerMapOf[int64, types.Search]()
 
 func (b Bot) onListType(c tele.Context) error {
-	userID := c.Sender().ID
+	var (
+		userID = c.Sender().ID
+		markup = c.Message().ReplyMarkup.InlineKeyboard
+	)
 
-	search := types.Search{Type: c.Data(), Search: "year"}
+	search := types.Search{Type: c.Data(), Search: "year", IsReport: false}
+	if len(markup) == 1 {
+		search.IsReport = true
+	}
 	searchPref.Store(userID, search)
 
 	years, err := b.db.Finances.FinanceDetailed(search, userID)
@@ -59,6 +67,13 @@ func (b Bot) onNumb(c tele.Context) error {
 		search.Search = "day"
 	case "day":
 		search.Day = userNumb
+	}
+
+	if search.Search == "day" && search.IsReport {
+		return c.Respond(&tele.CallbackResponse{
+			Text:      "⚠️ This type of report is still under construction.",
+			ShowAlert: true,
+		})
 	}
 
 	numbs, err := b.db.Finances.FinanceDetailed(search, userID)
@@ -106,9 +121,14 @@ func (b Bot) onSearchBack(c tele.Context) (err error) {
 	}
 
 	var (
-		markup     = b.listMarkup(c)
 		tempSearch = search
+		markup     = b.listMarkup(c)
+		ml         = len(markup.InlineKeyboard) - 1
 	)
+
+	if search.IsReport {
+		markup.InlineKeyboard = markup.InlineKeyboard[ml-1 : ml]
+	}
 
 	if search.Search != "year" {
 		switch search.Search {
@@ -177,6 +197,31 @@ func (b Bot) onSearchDone(c tele.Context) error {
 	}
 
 	searchPref.Store(userID, search)
+
+	if search.IsReport {
+		finances, err := b.db.Finances.Finances(userID, search)
+		if err != nil {
+			return err
+		}
+
+		data, err := excel.YearlyReport(finances, search.Type)
+		if err != nil {
+			return err
+		}
+
+		user := middle.User(c)
+		b.Delete(user.ListMessage())
+
+		_, err = b.Send(
+			c.Sender(),
+			&tele.Document{
+				File:     tele.FromReader(bytes.NewReader(data)),
+				FileName: b.Text(c, "report") + ".xlsx",
+			},
+		)
+
+		return err
+	}
 
 	finance, err := b.financeExt(c, 0)
 	if err != nil {
