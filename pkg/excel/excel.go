@@ -10,16 +10,20 @@ import (
 )
 
 const (
-	rowOffset    = 9
-	columnOffset = 'E'
+	rowOffset      = 9
+	columnOffset   = 'E'
+	blackColor     = "000000"
+	incomeColor    = "1B79AD"
+	expenseColor   = "1D7B7D"
+	totalColor     = "189855"
+	monthFillColor = "1B79AD"
+	monthFontColor = "FFFFFF"
 )
 
-// TODO: Optimize styles
-// TODO: Remove meaningless variables make code much readable
-// TODO: Break to smaller pieces
+func DetailedReport(finances map[string][]database.Finance, ft string, im ...bool) ([]byte, error) {
+	isMonth := len(im) > 0 && im[0]
 
-func YearlyReport(finances map[string][]database.Finance, ft string) ([]byte, error) {
-	file, err := excelize.OpenFile("./assets/yearly.xlsx")
+	file, err := excelize.OpenFile("./assets/template.xlsx")
 	if err != nil {
 		return nil, err
 	}
@@ -33,24 +37,43 @@ func YearlyReport(finances map[string][]database.Finance, ft string) ([]byte, er
 		return nil, err
 	}
 
-	borderStyles, err := file.NewStyle(&excelize.Style{
-		Fill: excelize.Fill{Type: "pattern", Color: []string{"1B79AD"}, Pattern: 1},
-	})
-	if ft == "expense" {
-		borderStyles, err = file.NewStyle(&excelize.Style{
-			Fill: excelize.Fill{Type: "pattern", Color: []string{"1D7B7D"}, Pattern: 1},
+	if isMonth {
+		file.SetCellInt(ft, "Q6", int(time.Now().Month()))
+
+		monthStyles, err := file.NewStyle(&excelize.Style{
+			Fill: excelize.Fill{
+				Type:  "pattern",
+				Color: []string{monthFillColor}, Pattern: 1},
+			Border:    []excelize.Border{{Type: "bottom", Style: 2, Color: blackColor}},
+			Font:      &excelize.Font{Family: "Gill Sans MT", Size: 12, Bold: true, Color: monthFontColor},
+			Alignment: &excelize.Alignment{Horizontal: "center"},
 		})
+		if err != nil {
+			return nil, err
+		}
+		file.SetCellStyle(ft, "Q6", "Q6", monthStyles)
 	}
+
+	file.SetCellInt(ft, "R6", time.Now().Year())
+
+	borderFill := excelize.Fill{Type: "pattern", Color: []string{incomeColor}, Pattern: 1}
+	if ft == "expense" {
+		borderFill.Color = []string{expenseColor}
+	}
+	borderStyles, err := file.NewStyle(&excelize.Style{Fill: borderFill})
 	if err != nil {
 		return nil, err
 	}
 
+	dateBorder := []excelize.Border{
+		{Type: "top", Style: 2, Color: blackColor},
+		{Type: "bottom", Style: 2, Color: blackColor},
+		{Type: "left", Style: 2, Color: blackColor},
+		{Type: "right", Style: 2, Color: blackColor},
+	}
+
 	categoryStyles, err := file.NewStyle(&excelize.Style{
-		Border: []excelize.Border{
-			{Type: "bottom", Style: 2, Color: "000000"},
-			{Type: "top", Style: 2, Color: "000000"},
-			{Type: "left", Style: 2, Color: "000000"},
-		},
+		Border: dateBorder,
 		Font: &excelize.Font{
 			Bold:   true,
 			Family: "Calisto MT",
@@ -62,14 +85,9 @@ func YearlyReport(finances map[string][]database.Finance, ft string) ([]byte, er
 		return nil, err
 	}
 
-	monthStyles, err := file.NewStyle(&excelize.Style{
-		Border: []excelize.Border{
-			{Type: "top", Style: 2, Color: "000000"},
-			{Type: "bottom", Style: 2, Color: "000000"},
-			{Type: "left", Style: 2, Color: "000000"},
-			{Type: "right", Style: 2, Color: "000000"},
-		},
-		Font: &excelize.Font{Color: "000000"},
+	dateStyles, err := file.NewStyle(&excelize.Style{
+		Border: dateBorder,
+		Font:   &excelize.Font{Color: blackColor},
 	})
 	if err != nil {
 		return nil, err
@@ -82,8 +100,16 @@ func YearlyReport(finances map[string][]database.Finance, ft string) ([]byte, er
 
 	for month, fin := range finances {
 		monthCode, _ := strconv.Atoi(month)
-		file.SetCellValue(ft, fmt.Sprintf("%s8", string(monthStep)), strings.ToUpper(time.Month(monthCode).String()[:3]))
-		file.SetCellStyle(ft, fmt.Sprintf("%s8", string(monthStep)), fmt.Sprintf("%s8", string(monthStep)), monthStyles)
+		cellPlacement := fmt.Sprintf("%s8", string(monthStep))
+
+		if isMonth {
+			monthCode, _ = strconv.Atoi(month)
+			file.SetCellValue(ft, cellPlacement, monthCode)
+		} else {
+			file.SetCellValue(ft, cellPlacement, strings.ToUpper(time.Month(monthCode).String()[:3]))
+		}
+
+		file.SetCellStyle(ft, cellPlacement, cellPlacement, dateStyles)
 
 		for _, finance := range fin {
 			category := finance.Category
@@ -98,20 +124,19 @@ func YearlyReport(finances map[string][]database.Finance, ft string) ([]byte, er
 		monthStep++
 	}
 
-	file.SetCellValue(ft, fmt.Sprintf("%s8", string(monthStep)), "YEAR")
-	file.SetCellStyle(ft, fmt.Sprintf("%s8", string(monthStep)), fmt.Sprintf("%s8", string(monthStep)), monthStyles)
+	file.SetCellValue(ft, fmt.Sprintf("%s8", string(monthStep)), "TOTAL")
+	file.SetCellStyle(ft, fmt.Sprintf("%s8", string(monthStep)), fmt.Sprintf("%s8", string(monthStep)), dateStyles)
+
+	amountFont := &excelize.Font{Family: "Cascadia Mono", Size: 11}
 
 	amountStyles, err := file.NewStyle(&excelize.Style{
 		Border: []excelize.Border{
-			{Type: "top", Style: 1, Color: "000000"},
-			{Type: "bottom", Style: 1, Color: "000000"},
-			{Type: "left", Style: 2, Color: "000000"},
-			{Type: "right", Style: 2, Color: "000000"},
+			{Type: "top", Style: 1, Color: blackColor},
+			{Type: "bottom", Style: 1, Color: blackColor},
+			{Type: "left", Style: 2, Color: blackColor},
+			{Type: "right", Style: 2, Color: blackColor},
 		},
-		Font: &excelize.Font{
-			Family: "Cascadia Mono",
-			Size:   11,
-		},
+		Font:      amountFont,
 		Alignment: &excelize.Alignment{Horizontal: "right"},
 	})
 	if err != nil {
@@ -120,57 +145,49 @@ func YearlyReport(finances map[string][]database.Finance, ft string) ([]byte, er
 
 	offset := rowOffset
 	for category, monthlyAmounts := range categories {
-		file.SetCellStyle(ft, fmt.Sprintf("C%v", offset), fmt.Sprintf("C%v", offset), borderStyles)
-		file.SetCellStyle(ft, fmt.Sprintf("D%v", offset), fmt.Sprintf("D%v", offset), categoryStyles)
-		file.SetCellValue(ft, fmt.Sprintf("D%v", offset), category)
+		file.SetCellStyle(ft, fmt.Sprintf("C%d", offset), fmt.Sprintf("C%d", offset), borderStyles)
+		file.SetCellStyle(ft, fmt.Sprintf("D%d", offset), fmt.Sprintf("D%d", offset), categoryStyles)
+		file.SetCellValue(ft, fmt.Sprintf("D%d", offset), category)
 
 		for month, amount := range monthlyAmounts {
 			file.SetCellValue(ft, fmt.Sprintf("%c%d", month, offset), amount)
-			file.SetCellStyle(ft, fmt.Sprintf("%s%v", string(monthStep), offset), fmt.Sprintf("%s%v", string(monthStep), offset), amountStyles)
+			file.SetCellStyle(ft, fmt.Sprintf("%s%d", string(monthStep), offset), fmt.Sprintf("%s%d", string(monthStep), offset), amountStyles)
 		}
 		offset++
 	}
 
-	// Set styles for amount
 	monthStep = columnOffset
 	for i := 0; i < len(finances); i++ {
 		for j := rowOffset; j < len(categories)+rowOffset; j++ {
-			file.SetCellStyle(ft, fmt.Sprintf("%v%v", string(monthStep), j), fmt.Sprintf("%v%v", string(monthStep), j), amountStyles)
+			file.SetCellStyle(ft, fmt.Sprintf("%s%d", string(monthStep), j), fmt.Sprintf("%s%d", string(monthStep), j), amountStyles)
 		}
 		monthStep++
 	}
 
-	// Reset last row styles
+	amountFont.Color = totalColor
 	bottomStyles, err := file.NewStyle(&excelize.Style{
-		Border: []excelize.Border{
-			{Type: "top", Style: 2, Color: "000000"},
-			{Type: "bottom", Style: 2, Color: "000000"},
-			{Type: "left", Style: 2, Color: "000000"},
-			{Type: "right", Style: 2, Color: "000000"},
-		},
-		Font: &excelize.Font{
-			Family: "Cascadia Mono",
-			Size:   11,
-			Color:  "189855",
-		},
+		Border:    dateBorder,
+		Font:      amountFont,
 		Alignment: &excelize.Alignment{Horizontal: "right"},
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	file.SetCellValue(ft, fmt.Sprintf("D%d", offset), "Total")
+	file.SetCellStyle(ft, fmt.Sprintf("D%d", offset), fmt.Sprintf("D%d", offset), categoryStyles)
 
 	monthStep = columnOffset
-	amountEnd := rowOffset + len(categories)
-
-	file.SetCellValue(ft, fmt.Sprintf("D%d", amountEnd), "Total")
-	file.SetCellStyle(ft, fmt.Sprintf("D%d", amountEnd), fmt.Sprintf("D%d", amountEnd), categoryStyles)
-
 	for i := 0; i < len(finances)+1; i++ {
-		file.SetCellStyle(ft, fmt.Sprintf("%v%d", string(monthStep), amountEnd), fmt.Sprintf("%v%d", string(monthStep), amountEnd), bottomStyles)
-		file.SetCellFormula(ft, fmt.Sprintf("%s%d", string(monthStep), amountEnd), fmt.Sprintf("SUM(%s9:%s%d)", string(monthStep), string(monthStep), amountEnd-1))
+		file.SetCellStyle(ft, fmt.Sprintf("%s%d", string(monthStep), offset), fmt.Sprintf("%s%d", string(monthStep), offset), bottomStyles)
+		file.SetCellFormula(ft, fmt.Sprintf("%s%d", string(monthStep), offset), fmt.Sprintf("SUM(%s9:%s%d)", string(monthStep), string(monthStep), offset-1))
 		monthStep++
 	}
 
-	// Chart
-	var series []excelize.ChartSeries
-	monthEnd := columnOffset + len(finances) - 1
+	var (
+		series   []excelize.ChartSeries
+		monthEnd = columnOffset + len(finances) - 1
+	)
 
 	for j := rowOffset; j < len(categories)+rowOffset; j++ {
 		series = append(series, excelize.ChartSeries{
@@ -183,12 +200,17 @@ func YearlyReport(finances map[string][]database.Finance, ft string) ([]byte, er
 		file.SetCellStyle(ft, fmt.Sprintf("%s%d", string(monthEnd+1), j), fmt.Sprintf("%s%d", string(monthEnd+1), j), bottomStyles)
 	}
 
+	period := "Yearly"
+	if isMonth {
+		period = "Monthly"
+	}
+
 	if err := file.AddChart(ft, fmt.Sprintf("%c8", monthEnd+3), &excelize.Chart{
-		Type:   excelize.Col3DClustered,
-		Series: series,
-		Title:  excelize.ChartTitle{Name: "Yearly report of " + strings.Title(ft) + "s"},
-		XAxis:  excelize.ChartAxis{Font: excelize.Font{Color: "#000000"}},
-		YAxis:  excelize.ChartAxis{Font: excelize.Font{Color: "#000000"}},
+		Type: excelize.Col3DClustered, Series: series,
+		Title:     excelize.ChartTitle{Name: fmt.Sprintf("%s report of %ss", period, strings.Title(ft))},
+		Dimension: excelize.ChartDimension{Width: 620, Height: 400},
+		XAxis:     excelize.ChartAxis{Font: excelize.Font{Color: blackColor}},
+		YAxis:     excelize.ChartAxis{Font: excelize.Font{Color: blackColor}},
 	}); err != nil {
 		return nil, err
 	}

@@ -17,12 +17,12 @@ var searchPref = xsync.NewIntegerMapOf[int64, types.Search]()
 
 func (b Bot) onListType(c tele.Context) error {
 	var (
-		userID = c.Sender().ID
-		markup = c.Message().ReplyMarkup.InlineKeyboard
+		userID    = c.Sender().ID
+		msgMarkup = c.Message().ReplyMarkup.InlineKeyboard
 	)
 
 	search := types.Search{Type: c.Data(), Search: "year", IsReport: false}
-	if len(markup) == 1 {
+	if len(msgMarkup) == 1 {
 		search.IsReport = true
 	}
 	searchPref.Store(userID, search)
@@ -38,10 +38,17 @@ func (b Bot) onListType(c tele.Context) error {
 		})
 	}
 
+	markup := b.dateMarkup(c, years, true)
+
+	if search.IsReport {
+		ml := len(markup.InlineKeyboard) - 1
+		markup.InlineKeyboard[ml] = append(markup.InlineKeyboard[ml][:1], markup.InlineKeyboard[ml][2:]...)
+	}
+
 	_, err = b.Edit(
 		middle.User(c).ListMessage(),
 		b.Text(c, "search_year"),
-		b.dateMarkup(c, years, true),
+		markup,
 	)
 
 	return err
@@ -70,10 +77,31 @@ func (b Bot) onNumb(c tele.Context) error {
 	}
 
 	if search.Search == "day" && search.IsReport {
-		return c.Respond(&tele.CallbackResponse{
-			Text:      "⚠️ This type of report is still under construction.",
-			ShowAlert: true,
-		})
+		search.Search = "month"
+
+		finances, err := b.db.Finances.Finances(userID, search)
+		if err != nil {
+			return err
+		}
+
+		data, err := excel.DetailedReport(finances, search.Type, true)
+		if err != nil {
+			return err
+		}
+
+		user := middle.User(c)
+		b.Delete(user.ListMessage())
+
+		_, err = b.Send(
+			c.Sender(),
+			&tele.Document{
+				File:     tele.FromReader(bytes.NewReader(data)),
+				FileName: b.Text(c, "report") + ".xlsx",
+			},
+		)
+
+		searchPref.Delete(userID)
+		return err
 	}
 
 	numbs, err := b.db.Finances.FinanceDetailed(search, userID)
@@ -204,7 +232,7 @@ func (b Bot) onSearchDone(c tele.Context) error {
 			return err
 		}
 
-		data, err := excel.YearlyReport(finances, search.Type)
+		data, err := excel.DetailedReport(finances, search.Type)
 		if err != nil {
 			return err
 		}
@@ -220,6 +248,7 @@ func (b Bot) onSearchDone(c tele.Context) error {
 			},
 		)
 
+		searchPref.Delete(userID)
 		return err
 	}
 

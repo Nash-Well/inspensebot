@@ -182,11 +182,10 @@ func (db *Finances) Finances(userID int64, search types.Search) (map[string][]Fi
 			($1 = '' 
 		    OR ($1 = 'year' AND EXTRACT(YEAR FROM date) = $4))
 			OR ($1 = 'month' AND EXTRACT(YEAR FROM date) = $4 AND EXTRACT(MONTH FROM date) = $5)
-			OR ($1 = 'day' AND EXTRACT(YEAR FROM date) = $4 AND EXTRACT(MONTH FROM date) = $5 AND EXTRACT(DAY FROM date) = $6)
 		) AND type = $2 GROUP BY category, date
 		ORDER BY EXTRACT(MONTH FROM date), category ASC`
 
-	rows, err := db.Query(q, search.Search, search.Type, userID, search.Year, search.Month, search.Day)
+	rows, err := db.Query(q, search.Search, search.Type, userID, search.Year, search.Month)
 	if err != nil {
 		return nil, err
 	}
@@ -207,6 +206,10 @@ func (db *Finances) Finances(userID int64, search types.Search) (map[string][]Fi
 		}
 
 		dateStr := date.Format("01")
+		if search.Search == "month" {
+			dateStr = date.Format("02")
+		}
+
 		finance := Finance{
 			Amount:   amount,
 			Category: category,
