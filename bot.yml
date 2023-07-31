@@ -31,8 +31,8 @@ buttons:
   # Category
   category:
     unique: category
-    data: '{{ .Category }}'
-    text: '{{ .Category }}'
+    data: '{{ . }}'
+    text: '{{ . }}'
   forward:
     unique: forward
     data: '{{ . }}'
