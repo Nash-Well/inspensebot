@@ -217,10 +217,7 @@ func (b Bot) onDeny(c tele.Context) error {
 	markup := b.NewMarkup()
 	markup.Inline(markup.Split(1, row)...)
 
-	return c.Send(
-		b.Text(c, "deny"),
-		markup,
-	)
+	return c.Send(b.Text(c, "deny"), markup)
 }
 
 func (b Bot) onUserDeny(c tele.Context) error {

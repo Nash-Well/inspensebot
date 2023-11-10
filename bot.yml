@@ -8,6 +8,8 @@ commands:
   /add: 'Add Finance'
   /list: 'List of finances'
   /share: 'Share finances'
+  /view: 'View shared finances'
+  /deny: 'Deny sharing'
 
 buttons:
   # Reply buttons

@@ -36,8 +36,8 @@ type (
 )
 
 func (db *ShareLists) Add(s ShareList) error {
-	const q = `INSERT INTO share_list(from_user, forward_from, from_name, share_type) VALUES ($1, $2, $3, $4)`
-	_, err := db.Exec(q, s.FromUser, s.ForwardFrom, s.FromUserName, s.ShareType)
+	const q = `INSERT INTO share_list(from_user, forward_from, from_name, share_type, forward_name) VALUES ($1, $2, $3, $4, $5)`
+	_, err := db.Exec(q, s.FromUser, s.ForwardFrom, s.FromUserName, s.ShareType, s.ForwardUserName)
 	return err
 }
 
