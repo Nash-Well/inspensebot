@@ -90,46 +90,58 @@ func (db *Finances) CategoryCount(f Finance) (c int, _ error) {
 }
 
 func (db *Finances) UserByOffset(u *User) (f Finance, _ error) {
-	const q = `SELECT MAX(id) as id, user_id, type, MAX(date) as date, MAX(amount) as amount, MAX(category) as category,
-               MAX(subcategory) as subcategory FROM finances WHERE user_id=$1 GROUP BY user_id, type, category, 
-               subcategory ORDER BY type, date,id LIMIT 1 OFFSET $2`
+	const q = `
+		SELECT DISTINCT ON (user_id, type, category, subcategory, date, amount)
+		MAX(id) AS id, user_id, type, MAX(date) AS date, MAX(amount) AS amount, MAX(category) AS category,
+		MAX(subcategory) AS subcategory
+		FROM finances
+		WHERE user_id = $1
+		GROUP BY user_id, type, category, subcategory, date, amount
+		ORDER BY user_id, type, category, subcategory, date DESC, amount DESC, id DESC
+		LIMIT 1 OFFSET $2;`
 	return f, db.Get(&f, q, u.ID, u.GetCache().ListPage)
 }
 
 func (db *Finances) ListCount(userID int64) (c int, _ error) {
-	const q = `SELECT count(*) FROM (SELECT MAX(id) as id, user_id, type, MAX(date) as date, MAX(amount) as amount, 
-			   MAX(category) as category, MAX(subcategory) as subcategory FROM finances WHERE user_id=$1 
-			   GROUP BY user_id, type, category, subcategory) as count`
+	const q = `SELECT COUNT(*) FROM (
+			SELECT DISTINCT ON (user_id, type, category, subcategory, date, amount)
+				MAX(id) AS id, user_id, type, MAX(date) AS date, MAX(amount) AS amount, MAX(category) AS category,
+				MAX(subcategory) AS subcategory
+			FROM finances
+			WHERE user_id = $1
+			GROUP BY user_id, type, category, subcategory, date, amount
+		) AS count;`
 	return c, db.Get(&c, q, userID)
 }
 
 func (db *Finances) FinanceByOffset(vf ViewFinance) (f Finance, _ error) {
 	const q = `
-		SELECT MAX(id) AS id, user_id, type, MAX(date) AS date, MAX(amount) AS amount, MAX(category) AS category,
-		MAX(subcategory) AS subcategory	FROM finances WHERE user_id = $1
-		AND (
-   		($2 = '' AND type IN ('income', 'expense'))
-   		OR type = $2
-   		)
-		GROUP BY user_id, type, category, subcategory
-		ORDER BY type, date, id
-		LIMIT 1 OFFSET $3;
-   `
+		SELECT DISTINCT ON (user_id, type, category, subcategory, date, amount)
+		id, user_id, type, date, amount, category, subcategory
+		FROM finances
+		WHERE user_id = $1
+			AND (
+				($2 = '' AND type IN ('income', 'expense'))
+				OR type = $2
+			)
+		ORDER BY user_id, type, category, subcategory, date DESC, amount DESC, id DESC
+		LIMIT 1 OFFSET $3;`
 	return f, db.Get(&f, q, vf.UserID, vf.ShareType, vf.Page)
 }
 
 func (db *Finances) ViewCount(userID int64, shareType string) (c int, _ error) {
 	const q = `
-		SELECT COUNT(*) FROM
-		(SELECT MAX(id) AS id, user_id, type, MAX(date) AS date, MAX(amount) AS amount, MAX(category) AS category, 
-		MAX(subcategory) AS subcategory	FROM finances WHERE user_id = $1 
-		AND (
-   		($2 = '' AND type IN ('income', 'expense'))
-   		OR type = $2
-   		)
-		GROUP BY user_id, type, category, subcategory
-		ORDER BY type, date, id) as count
-	`
+		SELECT COUNT(*) FROM (
+			SELECT DISTINCT ON (user_id, type, category, subcategory, date, amount)
+				id, user_id, type, date, amount, category, subcategory
+			FROM finances
+			WHERE user_id = $1
+				AND (
+					($2 = '' AND type IN ('income', 'expense'))
+					OR type = $2
+				)
+			ORDER BY user_id, type, category, subcategory, date DESC, amount DESC, id DESC
+		) AS count;`
 	return c, db.Get(&c, q, userID, shareType)
 }
 
