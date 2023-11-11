@@ -57,6 +57,8 @@ func (b Bot) onMedia(c tele.Context) error {
 		return b.onAddMedia(c)
 	case database.StateEditRecipient:
 		return b.onEditedRecipient(c)
+	case database.StateForwardMessage:
+		return b.onForwardMessage(c)
 	default:
 		return nil
 	}

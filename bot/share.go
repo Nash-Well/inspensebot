@@ -27,6 +27,8 @@ func (b Bot) onForwardMessage(c tele.Context) error {
 		user = middle.User(c)
 	)
 
+	defer c.Delete()
+
 	b.Delete(user.ShareMessage())
 
 	if !msg.IsForwarded() {
