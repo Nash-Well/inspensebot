@@ -176,6 +176,22 @@ buttons:
     <<: *lang
     data: 'en'
     text: '🇬🇧'
+  de:
+    <<: *lang
+    data: 'de'
+    text: '🇩🇪'
+  sl:
+    <<: *lang
+    data: 'sl'
+    text: '🇸🇮'
+  pl:
+    <<: *lang
+    data: 'pl'
+    text: '🇵🇱'
+  ja:
+    <<: *lang
+    data: 'ja'
+    text: '🇯🇵'
 
 markups:
   menu:
@@ -184,7 +200,8 @@ markups:
     - [ settings, report ]
 
   lang_menu:
-    - [ uk, en ]
+    - [ uk, en, de ]
+    - [ sl, pl, ja ]
 
   type_menu:
     - [ inc, exp ]

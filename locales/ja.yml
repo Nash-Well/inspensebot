@@ -1,0 +1,148 @@
+start: |-
+  {{ if not .LastName }}
+  👋 <b>こんにちは{{ .FirstName }}</b>
+  {{ else }}
+  👋 <b>こんにちは{{ .FirstName }} {{ .LastName }}</b>!
+  {{ end }}
+  はじめまして！
+  
+  🧾 あなたの財政を管理し、支出と収入を追跡するのを手伝います。
+  
+  💬 ボットを使い始めるには、<b><i>コマンドを入力</i></b>するか、<b><i>メニューからボタンを選択</i></b>して画面の指示に従ってください。
+  
+  ⁉️ <b>設定を使用して言語を変更してください。</b>
+  
+  🤝 <b>さあ、始めましょう！</b>
+
+# auxiliary
+add_fin: '財政の種類を選択してください: '
+add_date: '📅 日付を入力してください: '
+add_amount: '💵 金額を入力してください: '
+add_category: '📁 カテゴリを入力してください:'
+subcategory: '❓ サブカテゴリを入力しますか？'
+add_subcategory: '🔖 サブカテゴリを入力してください:'
+fin_added: '👌 <b>正常に追加されました</b>'
+lang_success: '🔄 言語が正常に更新されました'
+recipient: '<i>受取人を送信: </i>'
+recipient_exists: '<b>財政の受領書がありますか？</b>'
+
+# List Search
+search_empty_type: |-
+  そのタイプの財政がまだありません。
+search_type: '適切なタイプを選択してください: '
+search_year: '年を選択してください:'
+search_month: '月を選択してください:'
+search_day: '日を選択してください:'
+search_back: '⬅️ 戻る'
+search_done: '完了 ✅'
+
+# List
+list_no_finances: |-
+  まだ財政を作成していません。 🙁
+  
+  /addコマンドかメニューの<b>'財政を追加'</b>ボタンを使用してください。
+
+list_single_record: |-
+  ナビゲーションメニューを使用するには、単一の財政があります。
+
+list: |-
+  <b>{{ .Date.Format "2006.01.02" }}</b>
+  {{ .Type }}: <b>{{ .Amount }}</b>
+  カテゴリ: <i>{{ .Category }}</i>
+  {{ if ne .Subcategory `` }}サブカテゴリ: <i>{{ .Subcategory }}</i>{{ end }}
+
+list_ext: |-
+  <b>{{ .Date.Format "2006.01.02" }}</b>
+  {{ .Type }}: <b>{{ .Amount }}</b>
+  カテゴリ: <i>{{ .Category }}</i>
+  {{ if ne .Subcategory `` }}サブカテゴリ: <i>{{ .Subcategory }}</i>{{ end }}
+  {{ if ne .MediaCaption `` }}<b>受取人のためのキャプション:</b> {{ .MediaCaption }}{{ end }}
+
+list_actions: |-
+  この財政は<b>{{ .Date.Format "2006.01.02" }}</b>のものです
+  
+  <b>財政に関連する追加のアクションはありますか？</b>
+
+list_edit_type_expense: '支出 → 収入'
+list_edit_type_income: '収入 → 支出'
+list_edit_amount: '金額を編集'
+list_edit_category: 'カテゴリを編集'
+list_add_subcategory: 'サブカテゴリを追加'
+list_edit_subcategory: 'サブカテゴリを編集'
+list_add_recipient: '受取人を追加'
+list_edit_recipient: '受取人を編集'
+back_to_list: '← 戻る'
+
+list_btn_all: '🧐 すべての財政を表示'
+
+edit_amount: |-
+  財政を更新するために新しい金額を送信してください。
+edit_category: |-
+  財政を更新するために新しいカテゴリを送信してください。
+edit_subcategory: |-
+  送信してください{{ if .Subcategory }} 新しいサブカテゴリで財政を更新します{{ else }} 財政に追加するサブカテゴリ{{ end }}。
+edit_recipient: |-
+  ここに文書の種類や写真のファイルを送信してください。
+
+# share
+share: |-
+  財政を共有したいユーザーから<b>メッセージを転送</b>するだけです。
+  
+  特定のタイプを共有する場合は、<code>/share type</code>と入力してください。
+  
+  タイプは<code>income</code>または<code>expense</code>のいずれかです。
+not_forward: |-
+  メッセージが正しく転送されていません。正しく転送されていることを確認してください。
+  
+  または、メッセージを転送しようとしているユーザーがプロパティ<b>"Forward Message"</b>を<b>"No one"</b>に設定している場合。
+user_not_exist: '転送しようとしているユーザーは私のサービスを使用していません。'
+shared: 'すでにそのユーザーと財政を共有しています。'
+success_share: |-
+  あなたが財政情報を表示するためのアクセスを許可したことを知らせるメッセージをユーザーに送信しました。
+  
+  ユーザーを共有リストから削除するには/denyコマンドを使用することもできます。彼らはもうあなたの財政を見ることはありません。
+share_info: |-
+  あなたは{{ .FromUserName }}のユーザーの財政を表示する権限を付与されました。 {{ .CreatedAt.Format "02-01-2006, 15:04" }}。
+  
+  表示が許可された財政の種類は{{ if eq .ShareType `` }}収入/支出{{ else }}{{ .ShareType }}{{ end }}です。
+  
+  /viewコマンドを使用して許可された財政の完全なリストを見ることができます。
+same_forward: 'メッセージは<b>自分自身</b>から転送されました。財政を共有したいユーザーから転送する必要があります。'
+
+# View
+view_empty_list: '誰もあなたに財政情報を表示する許可を与えていません。'
+view: '許可を与えられたすべてのユーザー（{{ len . }}）がここに表示されます。'
+
+# Report
+report: '詳細レポート'
+
+# Deny
+deny_empty_list: |-
+  誰にも財政情報へのアクセスを許可していません。
+deny: '財政情報を表示する許可を与えたすべてのユーザーのリストです。'
+denied: 'ユーザーはリストから正常に削除され、もはやあなたの財政情報を表示できません。'
+
+# locale
+help_lang: '🤔 言語の選択: '
+
+# errors
+error_date: '🛑 日付の形式が正しくありません <code>dd.mm.(yyyy)</code>'
+error_number: '⛔️ <b>番号</b>のようです。'
+error_negative: '⛔️ 財政は<b>負の数</b>にはできません！'
+error_time: '🛑 <b>発生していない</b>日付を入力することはできません。'
+
+# buttons
+btn_add: '⌨️ 財政を追加'
+btn_settings: '⚙️ 設定'
+btn_list: '📋 財政リスト'
+btn_inc: '収入'
+btn_exp: '支出'
+btn_exists: '✅ 存在する'
+btn_not_exists: '❌ 存在しない'
+btn_approval: '✅ はい'
+btn_not_apr: '❌ いいえ'
+btn_forward: '転送 ➡️'
+btn_back: '⬅️ 戻る'
+btn_cancel: '🚫 キャンセル'
+btn_func: '🤖 機能'
+btn_report: '📄 レポート'

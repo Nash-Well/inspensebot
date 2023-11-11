@@ -1,0 +1,148 @@
+start: |-
+  {{ if not .LastName }}
+  👋 <b>Hallo {{ .FirstName }}</b>
+  {{ else }}
+  👋 <b>Hallo {{ .FirstName }} {{ .LastName }}</b>!
+  {{ end }}
+  Schön, Sie zu treffen!
+
+  🧾 Ich werde Ihnen helfen, Ihre Finanzen zu verwalten und Ihre Ausgaben und Einnahmen im Blick zu behalten.
+
+  💬 Um mit dem Bot zu arbeiten, geben Sie <b><i> einen Befehl ein</i></b> oder wählen Sie eine Schaltfläche aus dem Menü <b><i> und folgen Sie den Anweisungen auf dem Bildschirm</i></b>.
+
+  ⁉️ <b>Verwenden Sie die Einstellungen, um die Sprache zu ändern.</b>
+
+  🤝 <b>Lass uns anfangen!</b>
+
+# auxiliary
+add_fin: 'Wählen Sie die Art der Finanzen: '
+add_date: '📅 Geben Sie ein Datum ein: '
+add_amount: '💵 Geben Sie den Betrag ein: '
+add_category: '📁 Geben Sie die Kategorie ein:'
+subcategory: '❓ Möchten Sie eine Unterkategorie eingeben?'
+add_subcategory: '🔖 Geben Sie die Unterkategorie ein:'
+fin_added: '👌 <b>Erfolgreich hinzugefügt</b>'
+lang_success: '🔄 Sprache erfolgreich aktualisiert'
+recipient: '<i>Sende einen Empfänger: </i>'
+recipient_exists: '<b>Haben Sie einen Beleg für die Finanzen?</b>'
+
+# List Search
+search_empty_type: |-
+  Sie haben noch keine Finanzen dieser Art.
+search_type: 'Wählen Sie einen passenden Typ aus: '
+search_year: 'Wählen Sie das Jahr:'
+search_month: 'Wählen Sie den Monat:'
+search_day: 'Wählen Sie den Tag:'
+search_back: '⬅️ Zurück'
+search_done: 'Erledigt ✅'
+
+# List
+list_no_finances: |-
+  Sie haben noch keine Finanzen gemacht. 🙁
+
+  Verwenden Sie den Befehl /add oder die Schaltfläche <b>'Finanzierung hinzufügen'</b> im Menü.
+
+list_single_record: |-
+  Sie haben eine einzelne Finanzierung, Sie sollten mehr machen, um das Navigationsmenü zu verwenden.
+
+list: |-
+  <b>{{ .Date.Format "2006.01.02" }}</b>
+  {{ .Type }}: <b>{{ .Amount }}</b>
+  Kategorie: <i>{{ .Category }}</i>
+  {{ if ne .Subcategory `` }}Unterkategorie: <i>{{ .Subcategory }}</i>{{ end }}
+
+list_ext: |-
+  <b>{{ .Date.Format "2006.01.02" }}</b>
+  {{ .Type }}: <b>{{ .Amount }}</b>
+  Kategorie: <i>{{ .Category }}</i>
+  {{ if ne .Subcategory `` }}Unterkategorie: <i>{{ .Subcategory }}</i>{{ end }}
+  {{ if ne .MediaCaption `` }}<b>Beschriftung für den Empfänger:</b> {{ .MediaCaption }}{{ end }}
+
+list_actions: |-
+  Diese Finanzierung ist für <b>{{ .Date.Format "2006.01.02" }}</b>
+
+  <b>Weitere Aktionen mit der Finanzierung?</b>
+
+list_edit_type_expense: 'Ausgabe → Einnahme'
+list_edit_type_income: 'Einnahme → Ausgabe'
+list_edit_amount: 'Betrag bearbeiten'
+list_edit_category: 'Kategorie bearbeiten'
+list_add_subcategory: 'Unterkategorie hinzufügen'
+list_edit_subcategory: 'Unterkategorie bearbeiten'
+list_add_recipient: 'Empfänger hinzufügen'
+list_edit_recipient: 'Empfänger bearbeiten'
+back_to_list: '← Zurück'
+
+list_btn_all: '🧐 Alle Finanzen anzeigen'
+
+edit_amount: |-
+  Senden Sie den neuen Betrag, um eine Finanzierung zu aktualisieren.
+edit_category: |-
+  Senden Sie eine neue Kategorie, um eine Finanzierung zu aktualisieren.
+edit_subcategory: |-
+  Senden Sie{{ if .Subcategory }} eine neue Unterkategorie, um eine Finanzierung zu aktualisieren{{ else }} die Unterkategorie, um sie zur Finanzierung hinzuzufügen{{ end }}.
+edit_recipient: |-
+  Senden Sie hier eine Datei mit dem Typ des Dokuments oder ein Foto.
+
+# share
+share: |-
+  Alles, was Sie tun müssen, ist, <b>die Nachricht weiterzuleiten</b> von dem Benutzer, dem Sie Ihre Finanzen zeigen möchten.
+
+  Wenn Sie einen bestimmten Typ teilen möchten, schreiben Sie <code>/share Typ</code>.
+
+  Der Typ kann <code>Einnahme</code> oder <code>Ausgabe</code> sein.
+not_forward: |-
+  Die Nachricht wurde nicht korrekt weitergeleitet. Stellen Sie sicher, dass sie richtig weitergeleitet ist.
+
+  Oder, wenn der Benutzer, von dem Sie versuchen, eine Nachricht weiterzuleiten, die Eigenschaft <b>"Nachricht weiterleiten"</b> auf <b>"Niemand"</b> gesetzt hat.
+user_not_exist: 'Der Benutzer, den Sie weiterleiten möchten, verwendet meinen Service nicht.'
+shared: 'Sie haben bereits diesem Benutzer Ihre Finanzen mitgeteilt.'
+success_share: |-
+  Ich habe gerade eine Nachricht an den Benutzer geschickt und ihm mitgeteilt, dass Sie ihm Zugriff auf Ihre finanziellen Informationen gewährt haben.
+
+  Sie können auch den Befehl /deny verwenden, um den Benutzer aus Ihrer Freigabeliste zu entfernen. Er wird Ihre Finanzen nicht mehr sehen.
+share_info: |-
+  Ihnen wurde die Erlaubnis erteilt, die Finanzen des Benutzers {{ .FromUserName }} am {{ .CreatedAt.Format "02-01-2006, 15:04" }} einzusehen.
+
+  Die Art der Finanzen, die Sie einsehen dürfen, ist {{ if eq .ShareType `` }}Einnahmen/Ausgaben{{ else }}{{ .ShareType }}{{ end }}.
+
+  Verwenden Sie den Befehl /view, um eine vollständige Liste der erlaubten Finanzen anzuzeigen.
+same_forward: 'Sie haben die Nachricht von <b>sich selbst</b> weitergeleitet. Sie sollte von dem Benutzer weitergeleitet werden, mit dem Sie Ihre Finanzen teilen möchten.'
+
+# View
+view_empty_list: 'Niemand hat Ihnen die Erlaubnis zum Anzeigen ihrer Finanzen erteilt.'
+view: 'Hier sind alle Benutzer ({{ len . }}), die Ihnen die Erlaubnis zum Anzeigen ihrer Finanzen erteilt haben.'
+
+# Report
+report: 'detailed-report'
+
+# Deny
+deny_empty_list: |-
+  Sie haben niemandem Zugriff auf Ihre Finanzen gewährt.
+deny: 'Hier ist eine Liste aller Benutzer, denen Sie die Erlaubnis zum Anzeigen Ihrer Finanzen erteilt haben.'
+denied: 'Der Benutzer wurde erfolgreich aus der Liste entfernt und kann Ihre Finanzen nicht mehr sehen.'
+
+# locale
+help_lang: '🤔 Sprachauswahl: '
+
+# errors
+error_date: '🛑 Falsches Datumsformat <code>tt.mm.(jjjj)</code>'
+error_number: '⛔️ Sieht aus wie eine <b>Zahl</b>.'
+error_negative: '⛔️ Finanzen können nicht <b>negativ</b> sein!'
+error_time: '🛑 Sie können kein Datum eingeben, das <b>nicht passiert</b> ist.'
+
+# buttons
+btn_add: '⌨️ Finanzierung hinzufügen'
+btn_settings: '⚙️ Einstellungen'
+btn_list: '📋 Liste der Finanzen'
+btn_inc: 'Einnahme'
+btn_exp: 'Ausgabe'
+btn_exists: '✅ Existiert'
+btn_not_exists: '❌ Existiert nicht'
+btn_approval: '✅ Ja'
+btn_not_apr: '❌ Nein'
+btn_forward: 'Weiter ➡️'
+btn_back: '⬅️ Zurück'
+btn_cancel: '🚫 Abbrechen'
+btn_func: '🤖 Funktionen'
+btn_report: '📄 Bericht'

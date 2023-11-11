@@ -1,0 +1,148 @@
+start: |-
+  {{ if not .LastName }}
+  👋 <b>Cześć {{ .FirstName }}</b>
+  {{ else }}
+  👋 <b>Cześć {{ .FirstName }} {{ .LastName }}</b>!
+  {{ end }}
+  Miło mi cię poznać!
+  
+  🧾 Pomogę ci zarządzać finansami i śledzić wydatki oraz przychody.
+  
+  💬 Aby zacząć pracę z botem, <b><i>wpisz polecenie</i></b> lub <b><i>wybierz przycisk z menu</i></b> i postępuj zgodnie z instrukcjami na ekranie.
+  
+  ⁉️ <b>Użyj ustawień, aby zmienić język.</b>
+  
+  🤝 <b>Zaczynajmy!</b>
+
+# auxiliary
+add_fin: 'Wybierz typ finansów: '
+add_date: '📅 Wprowadź datę: '
+add_amount: '💵 Wprowadź kwotę: '
+add_category: '📁 Wprowadź kategorię:'
+subcategory: '❓ Czy chcesz wprowadzić podkategorię?'
+add_subcategory: '🔖 Wprowadź podkategorię:'
+fin_added: '👌 <b>Pomyślnie dodano</b>'
+lang_success: '🔄 Język pomyślnie zaktualizowany'
+recipient: '<i>Wyślij odbiorcę: </i>'
+recipient_exists: '<b>Czy masz paragon do tych finansów?</b>'
+
+# List Search
+search_empty_type: |-
+  Nie masz jeszcze żadnych finansów tego typu.
+search_type: 'Wybierz odpowiedni typ: '
+search_year: 'Wybierz rok:'
+search_month: 'Wybierz miesiąc:'
+search_day: 'Wybierz dzień:'
+search_back: '⬅️ Wstecz'
+search_done: 'Gotowe ✅'
+
+# List
+list_no_finances: |-
+  Nie dokonałeś jeszcze żadnych finansów. 🙁
+  
+  Użyj polecenia /add lub przycisku <b>'Dodaj finanse'</b> w menu.
+
+list_single_record: |-
+  Masz jedno finansowanie, powinieneś zrobić ich więcej, aby skorzystać z menu nawigacyjnego.
+
+list: |-
+  <b>{{ .Date.Format "2006.01.02" }}</b>
+  {{ .Type }}: <b>{{ .Amount }}</b>
+  Kategoria: <i>{{ .Category }}</i>
+  {{ if ne .Subcategory `` }}Podkategoria: <i>{{ .Subcategory }}</i>{{ end }}
+
+list_ext: |-
+  <b>{{ .Date.Format "2006.01.02" }}</b>
+  {{ .Type }}: <b>{{ .Amount }}</b>
+  Kategoria: <i>{{ .Category }}</i>
+  {{ if ne .Subcategory `` }}Podkategoria: <i>{{ .Subcategory }}</i>{{ end }}
+  {{ if ne .MediaCaption `` }}<b>Podpis dla odbiorcy:</b> {{ .MediaCaption }}{{ end }}
+
+list_actions: |-
+  To finansowanie dotyczy <b>{{ .Date.Format "2006.01.02" }}</b>
+  
+  <b>Dodatkowe działania z finansami?</b>
+
+list_edit_type_expense: 'Wydatek → Przychód'
+list_edit_type_income: 'Przychód → Wydatek'
+list_edit_amount: 'Edytuj kwotę'
+list_edit_category: 'Edytuj kategorię'
+list_add_subcategory: 'Dodaj podkategorię'
+list_edit_subcategory: 'Edytuj podkategorię'
+list_add_recipient: 'Dodaj odbiorcę'
+list_edit_recipient: 'Edytuj odbiorcę'
+back_to_list: '← Wstecz'
+
+list_btn_all: '🧐 Zobacz wszystkie finanse'
+
+edit_amount: |-
+  Wyślij nową kwotę, aby zaktualizować finanse.
+edit_category: |-
+  Wyślij nową kategorię, aby zaktualizować finanse.
+edit_subcategory: |-
+  Wyślij{{ if .Subcategory }} nową podkategorię, aby zaktualizować finanse{{ else }} podkategorię, aby dodać ją do finansowania{{ end }}.
+edit_recipient: |-
+  Wyślij tutaj plik z rodzajem dokumentu lub zdjęciem.
+
+# share
+share: |-
+  Wszystko, co musisz zrobić, to <b>prześlij wiadomość</b> od użytkownika, z którym chcesz podzielić się finansami.
+  
+  Jeśli chcesz udostępnić konkretny typ, napisz <code>/share typ</code>.
+  
+  Typ może być <code>przychód</code> lub <code>wydatek</code>.
+not_forward: |-
+  Wiadomość nie została poprawnie przesłana. Upewnij się, że jest poprawnie przesłana.
+  
+  Lub, jeśli użytkownik, od którego próbujesz przesłać wiadomość, ma ustawioną właściwość <b>"Przesyłaj wiadomość"</b> na <b>"Nikt"</b>.
+user_not_exist: 'Użytkownik, do którego próbujesz przekazać, nie korzysta z mojej usługi.'
+shared: 'Już udostępniłeś te finanse temu użytkownikowi.'
+success_share: |-
+  Właśnie wysłałem wiadomość do użytkownika, informując go, że udzieliłeś mu dostępu do przeglądania twoich informacji finansowych.
+  
+  Możesz również użyć polecenia /deny, aby usunąć użytkownika z listy udostępniania. Nie zobaczą już twoich finansów.
+share_info: |-
+  Udzielono ci uprawnienia do przeglądania finansów użytkownika {{ .FromUserName }} z {{ .CreatedAt.Format "02-01-2006, 15:04" }}.
+  
+  Typ finansów, do których masz uprawnienia, to {{ if eq .ShareType `` }}Przychody/Wydatki{{ else }}{{ .ShareType }}{{ end }}.
+  
+  Użyj polecenia /view, aby zobaczyć pełną listę udostępnionych finansów.
+same_forward: 'Przekazałeś wiadomość od <b>siebie</b>. Powinna być przekazana od użytkownika, z którym chcesz podzielić się finansami.'
+
+# View
+view_empty_list: 'Nikt nie udzielił ci uprawnień do przeglądania swoich finansów.'
+view: 'Oto wszyscy użytkownicy ({{ len . }}), którzy udzielili ci uprawnień do przeglądania swoich finansów.'
+
+# Report
+report: 'szczegolowy-raport'
+
+# Deny
+deny_empty_list: |-
+  Nie udzieliłeś nikomu dostępu do swoich finansów.
+deny: 'Oto lista wszystkich użytkowników, którym udzieliłeś uprawnień do przeglądania swoich finansów.'
+denied: 'Użytkownik został pomyślnie usunięty z listy i nie może już przeglądać twoich finansów.'
+
+# locale
+help_lang: '🤔 Wybór języka: '
+
+# errors
+error_date: '🛑 Nieprawidłowy format daty <code>dd.mm.(rrrr)</code>'
+error_number: '⛔️ Wydaje się, że to <b>numer</b>.'
+error_negative: '⛔️ Finanse nie mogą być <b>ujemne</b>!'
+error_time: '🛑 Nie możesz wprowadzić daty, która <b>jeszcze nie nastąpiła</b>.'
+
+# buttons
+btn_add: '⌨️ Dodaj finanse'
+btn_settings: '⚙️ Ustawienia'
+btn_list: '📋 Lista finansów'
+btn_inc: 'Przychód'
+btn_exp: 'Wydatek'
+btn_exists: '✅ Istnieje'
+btn_not_exists: '❌ Nie istnieje'
+btn_approval: '✅ Tak'
+btn_not_apr: '❌ Nie'
+btn_forward: 'Prześlij ➡️'
+btn_back: '⬅️ Wstecz'
+btn_cancel: '🚫 Anuluj'
+btn_func: '🤖 Funkcje'
+btn_report: '📄 Raport'

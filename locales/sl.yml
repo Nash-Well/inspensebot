@@ -1,0 +1,148 @@
+start: |-
+  {{ if not .LastName }}
+  👋 <b>Zdravo {{ .FirstName }}</b>
+  {{ else }}
+  👋 <b>Zdravo {{ .FirstName }} {{ .LastName }}</b>!
+  {{ end }}
+  Veselo me je spoznati!
+  
+  🧾 Pomagal vam bom pri upravljanju financ in sledenju vašim stroškom in prihodkom.
+  
+  💬 Za začetek dela z botom vnesite <b><i> ukaz </i></b> ali <b><i> izberite gumb iz menija </i></b> in sledite navodilom na zaslonu.
+  
+  ⁉️ <b>Uporabite nastavitve za spremembo jezika.</b>
+  
+  🤝 <b>Začnimo!</b>
+
+# auxiliary
+add_fin: 'Izberite vrsto financiranja: '
+add_date: '📅 Vnesite datum: '
+add_amount: '💵 Vnesite znesek: '
+add_category: '📁 Vnesite kategorijo:'
+subcategory: '❓ Želite vnesti podkategorijo?'
+add_subcategory: '🔖 Vnesite podkategorijo:'
+fin_added: '👌 <b>Uspešno dodano</b>'
+lang_success: '🔄 Jezik uspešno posodobljen'
+recipient: '<i>Pošljite prejemnika: </i>'
+recipient_exists: '<b>Ali imate prejemnico za financiranje?</b>'
+
+# List Search
+search_empty_type: |-
+  Še niste imeli nobenih financ te vrste.
+search_type: 'Izberite ustrezno vrsto: '
+search_year: 'Izberite leto:'
+search_month: 'Izberite mesec:'
+search_day: 'Izberite dan:'
+search_back: '⬅️ Nazaj'
+search_done: 'Končano ✅'
+
+# List
+list_no_finances: |-
+  Še niste opravili nobenih financ. 🙁
+  
+  Uporabite ukaz /add ali gumb <b>'Dodaj financiranje'</b> v meniju.
+
+list_single_record: |-
+  Imate eno financiranje, več bi jih morali narediti, da boste lahko uporabljali navigacijski meni.
+
+list: |-
+  <b>{{ .Date.Format "2006.01.02" }}</b>
+  {{ .Type }}: <b>{{ .Amount }}</b>
+  Kategorija: <i>{{ .Category }}</i>
+  {{ if ne .Subcategory `` }}Podkategorija: <i>{{ .Subcategory }}</i>{{ end }}
+
+list_ext: |-
+  <b>{{ .Date.Format "2006.01.02" }}</b>
+  {{ .Type }}: <b>{{ .Amount }}</b>
+  Kategorija: <i>{{ .Category }}</i>
+  {{ if ne .Subcategory `` }}Podkategorija: <i>{{ .Subcategory }}</i>{{ end }}
+  {{ if ne .MediaCaption `` }}<b>Napis za prejemnika:</b> {{ .MediaCaption }}{{ end }}
+
+list_actions: |-
+  To financiranje je za <b>{{ .Date.Format "2006.01.02" }}</b>
+  
+  <b>Dodatna dejanja s financiranjem?</b>
+
+list_edit_type_expense: 'Strošek → Dohodek'
+list_edit_type_income: 'Dohodek → Strošek'
+list_edit_amount: 'Uredi znesek'
+list_edit_category: 'Uredi kategorijo'
+list_add_subcategory: 'Dodaj podkategorijo'
+list_edit_subcategory: 'Uredi podkategorijo'
+list_add_recipient: 'Dodaj prejemnika'
+list_edit_recipient: 'Uredi prejemnika'
+back_to_list: '← Nazaj'
+
+list_btn_all: '🧐 Poglej vse finance'
+
+edit_amount: |-
+  Pošljite nov znesek za posodobitev financiranja.
+edit_category: |-
+  Pošljite novo kategorijo za posodobitev financiranja.
+edit_subcategory: |-
+  Pošljite{{ if .Subcategory }} novo podkategorijo za posodobitev financiranja{{ else }} podkategorijo, da jo dodate k financiranju{{ end }}.
+edit_recipient: |-
+  Pošljite tukaj datoteko z vrsto dokumenta ali fotografijo.
+
+# share
+share: |-
+  Vse, kar morate storiti, je, da <b>naprej pošljete sporočilo</b> od uporabnika, s katerim želite deliti svoje financiranje.
+  
+  Če želite deliti določeno vrsto, vnesite <code>/share vrsta</code>.
+  
+  Vrsta lahko bo <code>dohodek</code> ali <code>strošek</code>.
+not_forward: |-
+  Sporočilo ni bilo pravilno posredovano. Prepričajte se, da je pravilno posredovano.
+  
+  Ali pa, če ima uporabnik, od katerega poskušate posredovati sporočilo, nastavljeno lastnost <b>"Posreduj sporočilo"</b> na <b>"Nihče"</b>.
+user_not_exist: 'Uporabnik, ki mu želite posredovati sporočilo, ne uporablja moje storitve.'
+shared: 'Že ste delili svoje financiranje s tem uporabnikom.'
+success_share: |-
+  Pravkar sem poslal sporočilo uporabniku, ki ga obvešča, da ste mu odobrili dostop do ogleda vaših finančnih informacij.
+  
+  Prav tako lahko uporabite ukaz /deny, da uporabnika odstranite s seznama deljenja. Ne bodo več videli vaših financ.
+share_info: |-
+  Odobrili so vam dostop do ogleda financiranja uporabnika {{ .FromUserName }} ob {{ .CreatedAt.Format "02-01-2006, 15:04" }}.
+  
+  Vrsta financiranja, ki vam je bila dovoljena, je {{ if eq .ShareType `` }}Dohodki/Izdatki{{ else }}{{ .ShareType }}{{ end }}.
+  
+  Uporabite ukaz /view, da si ogledate celoten seznam dovoljenih financ.
+same_forward: 'Poslali ste sporočilo od <b>sebe</b>. Posredovano mora biti od uporabnika, s katerim želite deliti svoje financiranje.'
+
+# View
+view_empty_list: 'Nihče vam ni dovolil ogleda svojih financ.'
+view: 'Tukaj so vsi uporabniki ({{ len . }}), ki so vam dovolili ogled svojih financ.'
+
+# Report
+report: 'podroben-poročilo'
+
+# Deny
+deny_empty_list: |-
+  Niste nikomur omogočili dostopa do svojih financ.
+deny: 'Tukaj je seznam vseh uporabnikov, ki ste jim dovolili ogled svojih financ.'
+denied: 'Uporabnik je uspešno odstranjen s seznama in ne more več videti vaših financ.'
+
+# locale
+help_lang: '🤔 Izbor jezika: '
+
+# errors
+error_date: '🛑 Napačen format datuma <code>dd.mm.(llll)</code>'
+error_number: '⛔️ Zdi se, da gre za <b>številko</b>.'
+error_negative: '⛔️ Finančna sredstva ne morejo biti <b>negativna</b>!'
+error_time: '🛑 Ne morete vnesti datuma, ki se <b>še ni zgodil</b>.'
+
+# buttons
+btn_add: '⌨️ Dodaj financiranje'
+btn_settings: '⚙️ Nastavitve'
+btn_list: '📋 Seznam financ'
+btn_inc: 'Dohodek'
+btn_exp: 'Strošek'
+btn_exists: '✅ Obstaja'
+btn_not_exists: '❌ Ne obstaja'
+btn_approval: '✅ Da'
+btn_not_apr: '❌ Ne'
+btn_forward: 'Posreduj ➡️'
+btn_back: '⬅️ Nazaj'
+btn_cancel: '🚫 Prekliči'
+btn_func: '🤖 Funkcije'
+btn_report: '📄 Poročilo'
