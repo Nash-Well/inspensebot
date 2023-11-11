@@ -108,9 +108,12 @@ func (b Bot) onForwardList(c tele.Context) error {
 }
 
 func (b Bot) onFunctions(c tele.Context) error {
-	user := middle.User(c)
+	var (
+		user   = middle.User(c)
+		fID, _ = strconv.Atoi(c.Data())
+	)
 
-	finance, err := b.db.Finances.UserByOffset(user)
+	finance, err := b.db.Finances.ByID(fID)
 	if err != nil {
 		return err
 	}
