@@ -17,11 +17,15 @@ type (
 		UserByOffset(u *User) (Finance, error)
 		ListCount(userID int64) (int, error)
 		FinanceByOffset(vf ViewFinance) (Finance, error)
-		ViewCount(userID int64, shareType string) (c int, _ error)
-		SearchByOffset(user *User, search types.Search) (f Finance, _ error)
+		ViewCount(userID int64, shareType string) (int, error)
+		SearchByOffset(user *User, search types.Search) (Finance, error)
 		SearchCount(userID int64, search types.Search) (count int, _ error)
-		FinanceDetailed(search types.Search, userID int64) (res []int, _ error)
+		FinanceDetailed(search types.Search, userID int64) ([]int, error)
 		Finances(userID int64, search types.Search) (map[string][]Finance, error)
+		DeleteFinance(id int) error
+		SearchByDate(fd string) ([]Finance, error)
+		SearchByTypeDate(ft, fd string) ([]Finance, error)
+		SearchByAll(ft, fd, fc string) ([]Finance, error)
 	}
 
 	Finances struct {
@@ -239,4 +243,25 @@ func (db *Finances) Finances(userID int64, search types.Search) (map[string][]Fi
 	}
 
 	return financeMap, nil
+}
+
+func (db *Finances) DeleteFinance(id int) error {
+	const q = "DELETE FROM finances WHERE id=$1"
+	_, err := db.Exec(q, id)
+	return err
+}
+
+func (db *Finances) SearchByDate(fd string) (f []Finance, _ error) {
+	const q = "SELECT * FROM finances WHERE date=$1"
+	return f, db.Select(&f, q, fd)
+}
+
+func (db *Finances) SearchByTypeDate(ft, fd string) (f []Finance, _ error) {
+	const q = "SELECT * FROM finances WHERE type=$1 AND date=$2"
+	return f, db.Select(&f, q, ft, fd)
+}
+
+func (db *Finances) SearchByAll(ft, fd, fc string) (f []Finance, _ error) {
+	const q = "SELECT * FROM finances WHERE type=$1 AND date=$2 AND category ilike '%' || $3 || '%'"
+	return f, db.Select(&f, q, ft, fd, fc)
 }

@@ -14,7 +14,7 @@ type Bot struct {
 }
 
 func New(path string, boot BootStrap) (*Bot, error) {
-	lt, err := layout.New(path)
+	lt, err := layout.New(path, Funcs)
 	if err != nil {
 		return nil, err
 	}
@@ -45,6 +45,7 @@ func (b *Bot) Start() {
 	b.Handle("/add", b.onAdd)
 	b.Handle("/list", b.onList)
 	b.Handle("/share", b.onShare)
+	b.Handle("/search", b.onSearch)
 	b.Handle("/view", b.onView)
 	b.Handle("/deny", b.onDeny)
 
@@ -66,6 +67,7 @@ func (b *Bot) Start() {
 	b.Handle(b.Callback("forward"), b.onForwardCategory)
 
 	// List search
+	b.Handle(b.Callback("search_res"), b.onSearchRes)
 	b.Handle(b.Callback("search_type"), b.onListType)
 	b.Handle(b.Callback("search_numb"), b.onNumb)
 	b.Handle(b.Callback("search_back"), b.onSearchBack)
@@ -84,6 +86,7 @@ func (b *Bot) Start() {
 	b.Handle(b.Callback("list_edit_category"), b.onEditCategory)
 	b.Handle(b.Callback("list_add_subcategory"), b.onEditSubcategory)
 	b.Handle(b.Callback("list_add_recipient"), b.onEditRecipient)
+	b.Handle(b.Callback("list_delete_finance"), b.onDeleteFinance)
 	b.Handle(b.Callback("back_to_actions"), b.onBackToFinanceActions)
 
 	// View

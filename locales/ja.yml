@@ -36,6 +36,24 @@ search_day: '日を選択してください:'
 search_back: '⬅️ 戻る'
 search_done: '完了 ✅'
 
+search_pref: |-
+  他の検索の<b>優先事項</b>を指定する必要があります。以下はいくつかの例です：
+  
+  <code>/search expense 12.02.2023 Food</code>
+  <code>/search income 12.02</code>
+  <code>/search 12.02</code>
+
+search_res: |-
+  {{- range $idx, $fn := . }}
+  <b>{{ plus $idx }}.</b> 📆 <b>{{ $fn.Date.Format "02.01.2006" }}</b>
+  {{ $fn.Type }}: <b>{{ $fn.Amount }}</b>
+  カテゴリ: <i>{{ $fn.Category }}</i>
+  {{ if ne $fn.Subcategory `` }}サブカテゴリ: <i>{{ $fn.Subcategory }}</i>{{ end }}
+  {{ end -}}
+
+search_none: |-
+  申し訳ありませんが、リクエストされた内容に対応する<b>財政</b>はありません 😢。
+
 # List
 list_no_finances: |-
   まだ財政を作成していません。 🙁
@@ -63,6 +81,9 @@ list_actions: |-
   
   <b>財政に関連する追加のアクションはありますか？</b>
 
+list_deleted: |-
+  ✅ 財政は正常に削除されました。
+
 list_edit_type_expense: '支出 → 収入'
 list_edit_type_income: '収入 → 支出'
 list_edit_amount: '金額を編集'
@@ -71,6 +92,7 @@ list_add_subcategory: 'サブカテゴリを追加'
 list_edit_subcategory: 'サブカテゴリを編集'
 list_add_recipient: '受取人を追加'
 list_edit_recipient: '受取人を編集'
+list_delete_finance: '財政を削除する'
 back_to_list: '← 戻る'
 
 list_btn_all: '🧐 すべての財政を表示'

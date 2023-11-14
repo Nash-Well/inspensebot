@@ -10,6 +10,7 @@ type (
 	RecipientStorage interface {
 		Add(r Recipient) error
 		ByID(finID int) (Recipient, error)
+		DeleteRecipient(id int) error
 		UpdateRecipient(r Recipient) error
 	}
 
@@ -36,6 +37,12 @@ func (db *Recipients) Add(r Recipient) error {
 func (db *Recipients) ByID(finID int) (r Recipient, _ error) {
 	const q = `SELECT * FROM recipient WHERE finance_id=$1`
 	return r, db.Get(&r, q, finID)
+}
+
+func (db *Recipients) DeleteRecipient(id int) error {
+	const q = "DELETE FROM recipient WHERE finance_id=$1"
+	_, err := db.Exec(q, id)
+	return err
 }
 
 func (db *Recipients) UpdateRecipient(r Recipient) error {

@@ -36,6 +36,25 @@ search_day: 'Izberite dan:'
 search_back: '⬅️ Nazaj'
 search_done: 'Končano ✅'
 
+search_pref: |-
+  Tukaj morate navesti druge <b>prednostne nastavitve</b> iskanja. Tu je nekaj primerov:
+  
+  <code>/search expense 12.02.2023 Food</code>
+  <code>/search income 12.02</code>
+  <code>/search 12.02</code>
+
+search_res: |-
+  {{- range $idx, $fn := . }}
+  <b>{{ plus $idx }}.</b> 📆 <b>{{ $fn.Date.Format "02.01.2006" }}</b>
+  {{ $fn.Type }}: <b>{{ $fn.Amount }}</b>
+  Kategorija: <i>{{ $fn.Category }}</i>
+  {{ if ne $fn.Subcategory `` }}Podkategorija: <i>{{ $fn.Subcategory }}</i>{{ end }}
+  {{ end -}}
+
+search_none: |-
+  Žal ni <b>financ</b> glede na vašo zahtevo 😢.
+
+
 # List
 list_no_finances: |-
   Še niste opravili nobenih financ. 🙁
@@ -63,6 +82,10 @@ list_actions: |-
   
   <b>Dodatna dejanja s financiranjem?</b>
 
+list_deleted: |-
+  ✅ Finance so bile uspešno izbrisane.
+
+
 list_edit_type_expense: 'Strošek → Dohodek'
 list_edit_type_income: 'Dohodek → Strošek'
 list_edit_amount: 'Uredi znesek'
@@ -71,6 +94,7 @@ list_add_subcategory: 'Dodaj podkategorijo'
 list_edit_subcategory: 'Uredi podkategorijo'
 list_add_recipient: 'Dodaj prejemnika'
 list_edit_recipient: 'Uredi prejemnika'
+list_delete_finance: 'Izbriši finance'
 back_to_list: '← Nazaj'
 
 list_btn_all: '🧐 Poglej vse finance'

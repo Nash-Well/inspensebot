@@ -36,6 +36,24 @@ search_day: 'Select day:'
 search_back: '⬅️ Back'
 search_done: 'Done ✅'
 
+search_pref: |-
+  You should mention other search <b>preferences</b> here is a couple of examples:
+  
+  <code>/search expense 12.02.2023 Food</code>
+  <code>/search income 12.02</code>
+  <code>/search 12.02</code>
+
+search_res: |-
+  {{- range $idx, $fn := . }}
+  <b>{{ plus $idx }}.</b> 📆 <b>{{ $fn.Date.Format "02.01.2006" }}</b>
+  {{ $fn.Type }}: <b>{{ $fn.Amount }}</b>
+  Category: <i>{{ $fn.Category }}</i>
+  {{ if ne $fn.Subcategory `` }}Subcategory: <i>{{ $fn.Subcategory }}</i>{{ end }}
+  {{ end -}}
+
+search_none: |-
+  Sorry, but there is <b>no finance</b> for what you requested 😢.
+
 # List
 list_no_finances: |-
   You haven't made any finances yet. 🙁
@@ -63,6 +81,9 @@ list_actions: |-
   
   <b>Additional actions with finance?</b>
 
+list_deleted: |-
+  ✅ Finance has been successfully deleted.
+
 list_edit_type_expense: 'Expense → Income'
 list_edit_type_income: 'Income → Expense'
 list_edit_amount: 'Edit amount'
@@ -71,6 +92,7 @@ list_add_subcategory: 'Add subcategory'
 list_edit_subcategory: 'Edit subcategory'
 list_add_recipient: 'Add recipient'
 list_edit_recipient: 'Edit recipient'
+list_delete_finance: 'Delete finance'
 back_to_list: '← Back'
 
 list_btn_all: '🧐 View all finances'

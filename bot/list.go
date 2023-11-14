@@ -380,6 +380,29 @@ func (b Bot) onEditedRecipient(c tele.Context) error {
 	return b.constructListActions(c, f_ext)
 }
 
+func (b Bot) onDeleteFinance(c tele.Context) error {
+	var (
+		user    = middle.User(c)
+		fnID, _ = strconv.Atoi(c.Data())
+	)
+
+	_, err := b.db.Recipients.ByID(fnID)
+	if err == nil && err != sql.ErrNoRows {
+		err = b.db.Recipients.DeleteRecipient(fnID)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = b.db.Finances.DeleteFinance(fnID)
+	if err != nil {
+		return err
+	}
+
+	b.Delete(user.ListMessage())
+	return c.EditOrSend(b.Text(c, "list_deleted"))
+}
+
 func (b Bot) onBackToFinanceActions(c tele.Context) error {
 	id, _ := strconv.Atoi(c.Data())
 

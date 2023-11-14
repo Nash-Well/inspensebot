@@ -8,6 +8,7 @@ commands:
   /add: 'Add Finance'
   /list: 'List of finances'
   /share: 'Share finances'
+  /search: 'Search finance'
   /view: 'View shared finances'
   /deny: 'Deny sharing'
 
@@ -60,6 +61,10 @@ buttons:
   search_all:
     unique: search_all
     text: '{{ text `list_btn_all` }}'
+  search_res:
+    unique: search_res
+    data: '{{ .Finance.ID }}'
+    text: '{{ .Page }}'
 
   # List
   list_back:
@@ -111,6 +116,10 @@ buttons:
       {{ else }}
       {{ text `list_edit_recipient` }}
       {{ end }}
+  list_delete_finance:
+    unique: list_delete_finance
+    data: '{{ .Finance.ID }}'
+    text: '{{ text `list_delete_finance` }}'
   back_to_list:
     unique: back_to_list
     text: '{{ text `back_to_list` }}'
@@ -228,6 +237,7 @@ markups:
     - [ list_edit_category ]
     - [ list_add_subcategory ]
     - [ list_add_recipient ]
+    - [ list_delete_finance ]
     - [ back_to_list ]
 
   back_to_actions:

@@ -36,6 +36,25 @@ search_day: 'Wybierz dzień:'
 search_back: '⬅️ Wstecz'
 search_done: 'Gotowe ✅'
 
+search_pref: |-
+  Powinieneś podać inne <b>preferencje wyszukiwania</b>, oto kilka przykładów:
+  
+  <code>/search expense 12.02.2023 Food</code>
+  <code>/search income 12.02</code>
+  <code>/search 12.02</code>
+
+search_res: |-
+  {{- range $idx, $fn := . }}
+  <b>{{ plus $idx }}.</b> 📆 <b>{{ $fn.Date.Format "02.01.2006" }}</b>
+  {{ $fn.Type }}: <b>{{ $fn.Amount }}</b>
+  Kategoria: <i>{{ $fn.Category }}</i>
+  {{ if ne $fn.Subcategory `` }}Podkategoria: <i>{{ $fn.Subcategory }}</i>{{ end }}
+  {{ end -}}
+
+search_none: |-
+  Przykro mi, ale nie ma <b>finansów</b> zgodnych z twoim zapytaniem 😢.
+
+
 # List
 list_no_finances: |-
   Nie dokonałeś jeszcze żadnych finansów. 🙁
@@ -63,6 +82,9 @@ list_actions: |-
   
   <b>Dodatkowe działania z finansami?</b>
 
+list_deleted: |-
+  ✅ Finanse zostały pomyślnie usunięte.
+
 list_edit_type_expense: 'Wydatek → Przychód'
 list_edit_type_income: 'Przychód → Wydatek'
 list_edit_amount: 'Edytuj kwotę'
@@ -71,6 +93,7 @@ list_add_subcategory: 'Dodaj podkategorię'
 list_edit_subcategory: 'Edytuj podkategorię'
 list_add_recipient: 'Dodaj odbiorcę'
 list_edit_recipient: 'Edytuj odbiorcę'
+list_delete_finance: 'Usuń finanse'
 back_to_list: '← Wstecz'
 
 list_btn_all: '🧐 Zobacz wszystkie finanse'
