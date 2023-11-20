@@ -93,6 +93,7 @@ list_add_subcategory: 'Unterkategorie hinzufügen'
 list_edit_subcategory: 'Unterkategorie bearbeiten'
 list_add_recipient: 'Empfänger hinzufügen'
 list_edit_recipient: 'Empfänger bearbeiten'
+list_view_location: 'Standort anzeigen'
 list_delete_finance: 'Finanz löschen'
 back_to_list: '← Zurück'
 
@@ -132,6 +133,17 @@ share_info: |-
   Verwenden Sie den Befehl /view, um eine vollständige Liste der erlaubten Finanzen anzuzeigen.
 same_forward: 'Sie haben die Nachricht von <b>sich selbst</b> weitergeleitet. Sie sollte von dem Benutzer weitergeleitet werden, mit dem Sie Ihre Finanzen teilen möchten.'
 
+# Location
+
+location: |-
+  Möchten Sie einen Standort anhängen?
+
+add_location: |-
+  Verwenden Sie die bereitgestellte Schaltfläche oder drücken Sie 📎 und wählen Sie die Standortoption aus.
+
+error_no_location: |-
+  Sie haben keinen Standort während der Finanzerstellung angegeben.
+
 # View
 view_empty_list: 'Niemand hat Ihnen die Erlaubnis zum Anzeigen ihrer Finanzen erteilt.'
 view: 'Hier sind alle Benutzer ({{ len . }}), die Ihnen die Erlaubnis zum Anzeigen ihrer Finanzen erteilt haben.'
@@ -160,6 +172,7 @@ btn_settings: '⚙️ Einstellungen'
 btn_list: '📋 Liste der Finanzen'
 btn_inc: 'Einnahme'
 btn_exp: 'Ausgabe'
+btn_location: '📍 Standort senden'
 btn_exists: '✅ Existiert'
 btn_not_exists: '❌ Existiert nicht'
 btn_approval: '✅ Ja'

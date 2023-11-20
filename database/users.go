@@ -16,6 +16,7 @@ const (
 	StateAddDate         = "adding_date"
 	StateAddCategory     = "adding_category"
 	StateAddSubCategory  = "adding_subcategory"
+	StateAddLocation     = "adding_location"
 	StateAddMedia        = "adding_media"
 	StateForwardMessage  = "forward_message"
 	StateEditAmount      = "edit_amount"

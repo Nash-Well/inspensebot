@@ -40,6 +40,7 @@ type (
 		Amount      float64   `db:"amount,omitempty"`
 		Category    string    `db:"category,omitempty"`
 		Subcategory string    `db:"subcategory,omitempty"`
+		Location    []byte    `db:"location,omitempty"`
 	}
 )
 
@@ -49,9 +50,9 @@ func (db *Finances) ByID(id int) (f Finance, _ error) {
 }
 
 func (db *Finances) Create(f Finance) (int, error) {
-	const q = `INSERT INTO finances(user_id, type, date, amount, category, subcategory) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
+	const q = `INSERT INTO finances(user_id, type, date, amount, category, subcategory, location) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`
 	var id int
-	err := db.QueryRow(q, f.UserID, f.Type, f.Date, f.Amount, f.Category, f.Subcategory).Scan(&id)
+	err := db.QueryRow(q, f.UserID, f.Type, f.Date, f.Amount, f.Category, f.Subcategory, f.Location).Scan(&id)
 	return id, err
 }
 

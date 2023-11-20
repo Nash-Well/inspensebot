@@ -2,6 +2,9 @@ package bot
 
 import (
 	"database/sql"
+	"encoding/json"
+	"errors"
+	"fmt"
 	tele "gopkg.in/telebot.v3"
 	"inspense-bot/bot/middle"
 	"inspense-bot/database"
@@ -380,6 +383,32 @@ func (b Bot) onEditedRecipient(c tele.Context) error {
 	return b.constructListActions(c, f_ext)
 }
 
+func (b Bot) onViewLocation(c tele.Context) error {
+	fID, _ := strconv.Atoi(c.Data())
+
+	finance, err := b.db.Finances.ByID(fID)
+	if err != nil {
+		return err
+	}
+
+	var loc tele.Location
+	json.Unmarshal(finance.Location, &loc)
+
+	if loc.Lat == 0 && loc.Lng == 0 {
+		return c.Respond(&tele.CallbackResponse{
+			Text:      b.Text(c, "error_no_location"),
+			ShowAlert: true,
+		})
+	}
+
+	user := middle.User(c)
+
+	b.Delete(user.ListMessage())
+	b.Delete(user.ListActionsMessage())
+
+	return b.constructLocation(c, Finance{Finance: finance})
+}
+
 func (b Bot) onDeleteFinance(c tele.Context) error {
 	var (
 		user    = middle.User(c)
@@ -497,6 +526,48 @@ func (b Bot) constructList(c tele.Context, finance Finance, edit ...bool) (err e
 	}
 
 	user.UpdateCache("ListMessageID", msgList.ID)
+	return b.db.Users.SetCache(user)
+}
+
+func (b Bot) constructLocation(c tele.Context, finance Finance) (err error) {
+	var (
+		user       = middle.User(c)
+		msgList    *tele.Message
+		msgActions *tele.Message
+	)
+
+	msgList = c.Message()
+
+	var loc *tele.Location
+	json.Unmarshal(finance.Location, &loc)
+
+	if loc == nil {
+		return errors.New("bot")
+	}
+
+	var v = tele.Venue{
+		Location: *loc,
+		Title:    finance.Category,
+		Address:  fmt.Sprintf("%v $", finance.Amount),
+	}
+
+	msgList, err = v.Send(b.Bot, c.Sender(), nil)
+	if err != nil {
+		return err
+	}
+
+	msgActions, err = b.Send(
+		c.Sender(),
+		b.Text(c, "list_actions", finance),
+		b.Markup(c, "location_actions", finance),
+	)
+	if err != nil {
+		return err
+	}
+
+	user.UpdateCache("ListMessageID", msgList.ID)
+	user.UpdateCache("FinanceID", finance.Finance.ID)
+	user.UpdateCache("ActionsMessageID", msgActions.ID)
 	return b.db.Users.SetCache(user)
 }
 

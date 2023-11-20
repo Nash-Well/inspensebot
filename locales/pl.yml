@@ -93,6 +93,7 @@ list_add_subcategory: 'Dodaj podkategorię'
 list_edit_subcategory: 'Edytuj podkategorię'
 list_add_recipient: 'Dodaj odbiorcę'
 list_edit_recipient: 'Edytuj odbiorcę'
+list_view_location: 'Zobacz lokalizację'
 list_delete_finance: 'Usuń finanse'
 back_to_list: '← Wstecz'
 
@@ -132,6 +133,16 @@ share_info: |-
   Użyj polecenia /view, aby zobaczyć pełną listę udostępnionych finansów.
 same_forward: 'Przekazałeś wiadomość od <b>siebie</b>. Powinna być przekazana od użytkownika, z którym chcesz podzielić się finansami.'
 
+# Location
+location: |-
+  Czy chcesz dołączyć lokalizację?
+
+add_location: |-
+  Użyj dostarczonego przycisku lub naciśnij 📎 i wybierz opcję lokalizacji.
+
+error_no_location: |-
+  Nie podałeś lokalizacji podczas tworzenia finansów.
+
 # View
 view_empty_list: 'Nikt nie udzielił ci uprawnień do przeglądania swoich finansów.'
 view: 'Oto wszyscy użytkownicy ({{ len . }}), którzy udzielili ci uprawnień do przeglądania swoich finansów.'
@@ -160,6 +171,7 @@ btn_settings: '⚙️ Ustawienia'
 btn_list: '📋 Lista finansów'
 btn_inc: 'Przychód'
 btn_exp: 'Wydatek'
+btn_location: '📍 Wyślij lokalizację'
 btn_exists: '✅ Istnieje'
 btn_not_exists: '❌ Nie istnieje'
 btn_approval: '✅ Tak'

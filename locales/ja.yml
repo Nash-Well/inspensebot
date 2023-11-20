@@ -92,6 +92,7 @@ list_add_subcategory: 'サブカテゴリを追加'
 list_edit_subcategory: 'サブカテゴリを編集'
 list_add_recipient: '受取人を追加'
 list_edit_recipient: '受取人を編集'
+list_view_location: '位置を表示'
 list_delete_finance: '財政を削除する'
 back_to_list: '← 戻る'
 
@@ -131,6 +132,16 @@ share_info: |-
   /viewコマンドを使用して許可された財政の完全なリストを見ることができます。
 same_forward: 'メッセージは<b>自分自身</b>から転送されました。財政を共有したいユーザーから転送する必要があります。'
 
+# Location
+location: |-
+  位置情報を添付しますか？
+
+add_location: |-
+  提供されたボタンを使用するか、📎を押して場所のオプションを選択してください。
+
+error_no_location: |-
+  ファイナンスの作成中に場所が指定されていません。
+
 # View
 view_empty_list: '誰もあなたに財政情報を表示する許可を与えていません。'
 view: '許可を与えられたすべてのユーザー（{{ len . }}）がここに表示されます。'
@@ -159,6 +170,7 @@ btn_settings: '⚙️ 設定'
 btn_list: '📋 財政リスト'
 btn_inc: '収入'
 btn_exp: '支出'
+btn_location: '📍 位置を送信'
 btn_exists: '✅ 存在する'
 btn_not_exists: '❌ 存在しない'
 btn_approval: '✅ はい'

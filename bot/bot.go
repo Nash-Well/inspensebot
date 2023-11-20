@@ -61,6 +61,10 @@ func (b *Bot) Start() {
 	b.Handle(b.Callback("recipient"), b.onRecipient)
 	b.Handle(b.Callback("cancel"), b.onCancel)
 
+	// Location
+	b.Handle(tele.OnLocation, b.onLocation)
+	b.Handle(b.Callback("loc"), b.onLocationChoice)
+
 	// Category List
 	b.Handle(b.Callback("category"), b.onQuickCategory)
 	b.Handle(b.Callback("back"), b.onBackCategory)
@@ -86,6 +90,8 @@ func (b *Bot) Start() {
 	b.Handle(b.Callback("list_edit_category"), b.onEditCategory)
 	b.Handle(b.Callback("list_add_subcategory"), b.onEditSubcategory)
 	b.Handle(b.Callback("list_add_recipient"), b.onEditRecipient)
+	b.Handle(b.Callback("list_view_location"), b.onViewLocation)
+	b.Handle(b.Callback("back_to_list_menu"), b.onBackToListActions)
 	b.Handle(b.Callback("list_delete_finance"), b.onDeleteFinance)
 	b.Handle(b.Callback("back_to_actions"), b.onBackToFinanceActions)
 

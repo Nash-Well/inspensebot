@@ -107,6 +107,10 @@ buttons:
       {{ else }}
       {{ text `list_edit_subcategory` }}
       {{ end }}
+  list_view_location:
+    unique: list_view_location
+    text: '{{ text `list_view_location` }}'
+    data: '{{ .Finance.ID }}'
   list_add_recipient:
     unique: list_add_media
     data: '{{ .Finance.ID }}'
@@ -174,6 +178,27 @@ buttons:
     data: not_apr
     text: '{{ text `btn_not_apr` }}'
 
+  # Location
+  location:
+    text: '{{ text `btn_location` }}'
+    request_location: true
+
+  back_to_list_menu:
+    unique: back_to_list_menu
+    data: '{{ .Finance.ID }}'
+    text: '{{ text `btn_back` }}'
+
+  loc: &loc
+    unique: loc
+  loc_agr:
+    <<: *loc
+    data: loc_agr
+    text: '{{ text `btn_approval` }}'
+  loc_not:
+    <<: *loc
+    data: loc_not
+    text: '{{ text `btn_not_apr` }}'
+
   # Language
   lang: &lang
     unique: lang
@@ -237,6 +262,7 @@ markups:
     - [ list_edit_category ]
     - [ list_add_subcategory ]
     - [ list_add_recipient ]
+    - [ list_view_location ]
     - [ list_delete_finance ]
     - [ back_to_list ]
 
@@ -245,3 +271,12 @@ markups:
 
   view_menu:
     - [ view_back, view_forward ]
+
+  location:
+    - [ loc_agr, loc_not ]
+
+  user_location:
+    - [ location ]
+
+  location_actions:
+    - [ back_to_list_menu ]

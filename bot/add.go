@@ -2,6 +2,7 @@ package bot
 
 import (
 	"errors"
+	"github.com/jmoiron/sqlx/types"
 	"math"
 	"regexp"
 	"strconv"
@@ -297,8 +298,8 @@ func (b Bot) onSubCategory(c tele.Context) error {
 	finCache.Store(userID, finance)
 
 	return c.EditOrSend(
-		b.Text(c, "recipient_exists"),
-		b.Markup(c, "recipient_menu"),
+		b.Text(c, "location"),
+		b.Markup(c, "location"),
 	)
 }
 
@@ -307,15 +308,18 @@ func (b Bot) onSubMenu(c tele.Context) error {
 	case "approval":
 		c.Delete()
 
-		b.db.Users.SetState(c.Sender().ID, database.StateAddSubCategory)
-		return c.Send(
+		if err := c.Send(
 			b.Text(c, "add_subcategory"),
 			tele.ForceReply,
-		)
+		); err != nil {
+			return err
+		}
+
+		return b.db.Users.SetState(c.Sender().ID, database.StateAddSubCategory)
 	case "not_apr":
 		return c.EditOrSend(
-			b.Text(c, "recipient_exists"),
-			b.Markup(c, "recipient_menu"),
+			b.Text(c, "location"),
+			b.Markup(c, "location"),
 		)
 	default:
 		return nil
@@ -323,6 +327,10 @@ func (b Bot) onSubMenu(c tele.Context) error {
 }
 
 func (b Bot) addFinance(c tele.Context, f database.Finance) error {
+	if f.Location == nil {
+		f.Location = types.JSONText("{}")
+	}
+
 	if _, err := b.db.Finances.Create(f); err != nil {
 		return err
 	}

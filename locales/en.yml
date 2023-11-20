@@ -91,6 +91,7 @@ list_edit_category: 'Edit category'
 list_add_subcategory: 'Add subcategory'
 list_edit_subcategory: 'Edit subcategory'
 list_add_recipient: 'Add recipient'
+list_view_location: 'View location'
 list_edit_recipient: 'Edit recipient'
 list_delete_finance: 'Delete finance'
 back_to_list: '← Back'
@@ -131,6 +132,16 @@ share_info: |-
   Use /view command to see a whole list of permitted finances.
 same_forward: 'You forwarded the message from <b>yourself</b>. It should be forwarded from the user with whom you want to share your finances.'
 
+# Location
+location: |-
+  Do you want to attach a location ?
+
+add_location: |-
+  Use provided button or press 📎 and select location option.
+
+error_no_location: |-
+  You haven't provided a location during the finance creation.
+
 # View
 view_empty_list: 'No one has given you permission to view their finances.'
 view: 'Here is all users ({{ len . }}) who gave you permission to view their finances.'
@@ -159,6 +170,7 @@ btn_settings: '⚙️ Settings'
 btn_list: '📋 List of finances'
 btn_inc: 'Income'
 btn_exp: 'Expense'
+btn_location: '📍 Send location'
 btn_exists: '✅ Exists'
 btn_not_exists: '❌ Not exists'
 btn_approval: '✅ Yes'
